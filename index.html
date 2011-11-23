@@ -1,0 +1,18 @@
+<html>
+  <head></head>
+  <body>
+    <script src="raphael.js"></script>
+    <script src="leonardo.js"></script>
+
+    <script>
+      var paper = new Leonardo(100, 100, 300, 300);
+      var circle = paper.circle(100, 100, 100);
+      circle.attr({x: 150, y: 150, r: 50, fill: "#ff0000"}).attr({x: 100});
+
+      var rect = paper.rect(0, 0, 100, 50);
+      rect.attr({fill: "#0000ff"});
+
+      var path = paper.path([{M:[10,10]},{L:[10,20,30,40]},{V:[100, 200, 300]},{H:[100, 200, 300]}]);
+    </script>
+  </body>
+</html>
