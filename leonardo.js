@@ -4,16 +4,44 @@
   var w = this
     , d = w.document
     // valid attributes
-    , vattrs = {x:1,y:1,r:1,w:1,h:1,fill:1,path:1};
+    , vattrs = {x:1,y:1,cx:1,cy:1,r:1,w:1,h:1,fill:1,path:1}
+    // path commands
+    , pathCommands = {
+      M: function (v) {
+        this.l.ctx.moveTo(v[0], v[1]);
+      },
+      L: function (v) {
+        for (var i = 0, l = v.length; i < l; i += 2) {
+          this.l.ctx.lineTo(v[i], v[i + 1]);
+        }
+      },
+      l: function (v) {
+
+      },
+      V: function (v) {
+        this.l.ctx.lineTo(0, v);
+      },
+      H: function (v) {
+        this.l.ctx.lineTo(v, 0);
+      }
+    };
 
   function L() {
     if (!(this instanceof L)) {
       return new L();
     }
 
+    var self = this;
     this.canvas = L.createCanvas(arguments);
     this.ctx = this.canvas.getContext("2d");
     this.elements = [];
+    this.events = {};
+
+    this.canvas.onmousemove = function (e) {
+      var x = e.pageX - self.canvas.offsetLeft;
+      var y = e.pageY - self.canvas.offsetTop;
+      self.mouseOver(x, y);
+    }
   }
 
   L.prototype = {
@@ -33,11 +61,6 @@
     },
 
     path: function (p) {
-
-      if (!L.isO(p)) {
-        //p = L.parsePath()
-      }
-
       var attrs = {path: p};
       var path = E('path', attrs, this);
       path.draw();
@@ -49,6 +72,16 @@
       this.clear();
       this.elements.forEach(function (el) {
         el.draw();
+      });
+    },
+
+    mouseOver: function (x, y) {
+      var self = this;
+      this.events.mo = this.events.mo || [];
+      this.events.mo.forEach(function (el) {
+        if (L.isInRange(el[0], {x:x, y:y})) {
+          el[1].call(el[0]);
+        }
       });
     },
 
@@ -74,7 +107,6 @@
   E.prototype = {
     attr: function (args) {
       for (key in args) {
-        // TODO: test for correct attributes
         if (vattrs[key]) {
           this.attrs[key] = args[key];
         }
@@ -84,7 +116,6 @@
       return this;
     },
 
-    // TODO make it per type?
     draw: function () {
       var a = this.attrs,
           self = this;
@@ -103,39 +134,29 @@
       }
 
       if (this.type == "rect") {
-        this.l.ctx.fillRect(a.x, a.y, a.w, a.h);
-        this.l.ctx.strokeRect(a.x, a.y, a.w, a.h);
+        //this.l.ctx.fillRect(a.x, a.y, a.w, a.h);
+        this.l.ctx.rect(a.x, a.y, a.w, a.h);
+        this.l.ctx.fill();
+
+        //this.l.ctx.strokeRect(a.x, a.y, a.w, a.h);
       }
 
       if (this.type == "path") {
         this.attrs.path.forEach(this.processPath, this);
         this.l.ctx.stroke();
+        this.l.ctx.fill();
       }
-
       this.l.ctx.closePath();
+    },
+
+    mouseover: function (callback) {
+      this.l.events.mo = this.l.events.mo || [];
+      this.l.events.mo.push([this, callback]);
     },
 
     processPath: function (p) {
       for (c in p) {
-        switch(c) {
-          case 'M':
-            this.l.ctx.moveTo(p[c][0], p[c][1]);
-            break;
-          case 'L':
-            for (var i = 0, l = p[c].length; i < l; i += 2) {
-              this.l.ctx.lineTo(p[c][i], p[c][i + 1]);
-            }
-            break;
-          case 'V':
-            for (var i = 0, l = p[c].length; i < l; i += 2) {
-              this.l.ctx.lineTo(0, p[c][i]);
-            }
-            break;
-          case 'H':
-            for (var i = 0, l = p[c].length; i < l; i += 2) {
-              this.l.ctx.lineTo(p[c][i], 0);
-            }
-        }
+        pathCommands[c].call(this, p[c]);
       }
     }
   }
@@ -166,34 +187,32 @@
     return "Leonardo ver. " + L.version;
   }
 
-  // hash values to array
-  L.toA = function (h) {
-    var a = [];
-    for (k in h) {
-      a.push(h[k]);
+  L.isInRange = function (el, pt) {
+    if (el.type == "circle") {
+      var dx = el.attrs.x - pt.x;
+      var dy = el.attrs.y - pt.y;
+      return dx * dx + dy * dy <= el.attrs.r * el.attrs.r
     }
-    return a;
+    else {
+      for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+        ((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y))
+        && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x)
+        && (c = !c);
+      return c;
+    }
   }
 
-  L.isA = Array.isArray || function (o) {
-    return toString.call(o) == '[object Array]';
-  }
-
-  L.isN = function(o) {
-    return toString.call(o) == '[object Number]';
-  }
-
-  L.isO = function (o) {
-    return toString.call(o) == '[object Object]';
+  L.is = function (type, obj) {
+    var clas = Object.prototype.toString.call(obj).slice(8, -1);
+    return obj !== undefined && obj !== null && clas === type;
   }
 
   L.isAllN = function (o) {
     for (var i = 0, l = o.length; i < l; i++) {
-      if (!L.isN(o[i])) {
+      if (!L.is("Number", o[i])) {
         return false;
       }
     }
     return true;
   }
-
 }).call(this);

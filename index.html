@@ -9,10 +9,15 @@
       var circle = paper.circle(100, 100, 100);
       circle.attr({x: 150, y: 150, r: 50, fill: "#ff0000"}).attr({x: 100});
 
-      var rect = paper.rect(0, 0, 100, 50);
-      rect.attr({fill: "#0000ff"});
+      //var rect = paper.rect(0, 0, 100, 50);
+      //rect.attr({fill: "#0000ff"});
 
-      var path = paper.path([{M:[10,10]},{L:[10,20,30,40]},{V:[100, 200, 300]},{H:[100, 200, 300]}]);
+      circle.mouseover(function () {
+        this.attr({fill: "#00ff00"});
+      });
+
+      //var path = paper.path([{M:[10, 10]},{L:[100,10,100,100,150,150,10,100,10,10]}]);
+      //path.attr({fill: "#00ff00"});
     </script>
   </body>
 </html>
