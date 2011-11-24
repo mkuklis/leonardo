@@ -4,7 +4,7 @@
   var w = this
     , d = w.document
     // valid attributes
-    , vattrs = {x:1,y:1,cx:1,cy:1,r:1,w:1,h:1,fill:1,path:1}
+    , vattrs = {x:1,y:1,cx:1,cy:1,r:1,w:1,h:1,fill:1,path:1,"stroke-width": 1}
     , events = "mouseover mouseout mousedown mouseup click".split(" ")
 
     // path commands
@@ -41,10 +41,10 @@
 
     // setup events
     // TODO: make it generic
-    this.canvas.addEventListener('mousemove', function (e) { self.mouseOver(e); });
-    this.canvas.addEventListener('mousemove', function (e) { self.mouseOut(e); });
-    this.canvas.addEventListener('mousedown', function (e) { self.mouseDown(e); });
-    this.canvas.addEventListener('mouseup', function (e) { self.mouseUp(e); });
+    this.canvas.addEventListener('mousemove', function (e) { self.mouseover(e); });
+    this.canvas.addEventListener('mousemove', function (e) { self.mouseout(e); });
+    this.canvas.addEventListener('mousedown', function (e) { self.mousedown(e); });
+    this.canvas.addEventListener('mouseup', function (e) { self.mouseup(e); });
     this.canvas.addEventListener('click', function (e) { self.click(e); });
   }
 
@@ -88,7 +88,7 @@
       this.ctx.beginPath();
     },
 
-    mouseOver: function (e) {
+    mouseover: function (e) {
       var p = this.getPosition(e);
       this.events.mouseover.forEach(function (e) {
         if (!e.el.state.over && L.isPointInRange(e.el, p)) {
@@ -98,7 +98,7 @@
       });
     },
 
-    mouseOut: function (e) {
+    mouseout: function (e) {
       var p = this.getPosition(e);
       this.events.mouseout.forEach(function (e) {
         if (e.el.state.over && !L.isPointInRange(e.el, p)) {
@@ -108,7 +108,7 @@
       });
     },
 
-    mouseDown: function (e) {
+    mousedown: function (e) {
       var p = this.getPosition(e);
       this.events.mousedown.forEach(function (e) {
         if (L.isPointInRange(e.el, p)) {
@@ -117,7 +117,7 @@
       });
     },
 
-    mouseUp: function (e) {
+    mouseup: function (e) {
       var p = this.getPosition(e);
       this.events.mouseup.forEach(function (e) {
         if (L.isPointInRange(e.el, p)) {
