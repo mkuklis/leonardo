@@ -5,6 +5,8 @@
     , d = w.document
     // valid attributes
     , vattrs = {x:1,y:1,cx:1,cy:1,r:1,w:1,h:1,fill:1,path:1}
+    , events = "mouseover mouseout mousedown mouseup click".split(" ")
+
     // path commands
     , pathCommands = {
       M: function (v) {
@@ -24,7 +26,7 @@
       H: function (v) {
         this.l.ctx.lineTo(v, 0);
       }
-    };
+    }
 
   function L() {
     if (!(this instanceof L)) {
@@ -35,14 +37,19 @@
     this.canvas = L.createCanvas(arguments);
     this.ctx = this.canvas.getContext("2d");
     this.elements = [];
-    this.events = {};
+    this.events = {mouseover:[], mouseout:[], click: []};
 
-    this.canvas.onmousemove = function (e) {
-      var x = e.pageX - self.canvas.offsetLeft;
-      var y = e.pageY - self.canvas.offsetTop;
-      self.mouseOver(x, y);
-    }
+    // setup events
+    // TODO: make it generic
+    this.canvas.addEventListener('mousemove', function (e) { self.mouseOver(e); });
+    this.canvas.addEventListener('mousemove', function (e) { self.mouseOut(e); });
+    this.canvas.addEventListener('mousedown', function (e) { self.mouseDown(e); });
+    this.canvas.addEventListener('mouseup', function (e) { self.mouseUp(e); });
+    this.canvas.addEventListener('click', function (e) { self.click(e); });
   }
+
+  this.Leonardo = L;
+  L.version = 0.1;
 
   L.prototype = {
     circle: function (x, y, r) {
@@ -67,7 +74,7 @@
       return path;
     },
 
-    // process all elements and redraws them
+    // redraws all elements
     redraw: function () {
       this.clear();
       this.elements.forEach(function (el) {
@@ -75,90 +82,82 @@
       });
     },
 
-    mouseOver: function (x, y) {
-      var self = this;
-      this.events.mo = this.events.mo || [];
-      this.events.mo.forEach(function (el) {
-        if (L.isInRange(el[0], {x:x, y:y})) {
-          el[1].call(el[0]);
-        }
-      });
-    },
-
     // clears canvas
     clear: function () {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.beginPath();
+    },
+
+    mouseOver: function (e) {
+      var p = this.getPosition(e);
+      this.events.mouseover.forEach(function (e) {
+        if (!e.el.state.over && L.isPointInRange(e.el, p)) {
+          e.el.state.over = true;
+          e.callback.call(e.el);
+        }
+      });
+    },
+
+    mouseOut: function (e) {
+      var p = this.getPosition(e);
+      this.events.mouseout.forEach(function (e) {
+        if (e.el.state.over && !L.isPointInRange(e.el, p)) {
+          e.el.state.over = false;
+          e.callback.call(e.el);
+        }
+      });
+    },
+
+    mouseDown: function (e) {
+      var p = this.getPosition(e);
+      this.events.mousedown.forEach(function (e) {
+        if (L.isPointInRange(e.el, p)) {
+          e.callback.call(e.el);
+        }
+      });
+    },
+
+    mouseUp: function (e) {
+      var p = this.getPosition(e);
+      this.events.mouseup.forEach(function (e) {
+        if (L.isPointInRange(e.el, p)) {
+          e.callback.call(e.el);
+        }
+      });
+    },
+
+    click: function (e) {
+      var p = this.getPosition(e);
+      this.events.click.forEach(function (e) {
+        if (L.isPointInRange(e.el, p)) {
+          e.callback.call(e.el);
+        }
+      });
+    },
+
+    getPosition: function (e) {
+      var x = e.pageX - this.canvas.offsetLeft
+        , y = e.pageY - this.canvas.offsetTop;
+      return {x: x, y: y};
+    },
+
+    bind: function (eventName, el, callback) {
+      this.events[eventName] = this.events[eventName] || [];
+      this.events[eventName].push({el: el, callback: callback});
+    },
+
+    unbind: function (eventName, el, callback) {
+      var events = this.events[eventName];
+      events.forEach(function (e, i) {
+        if (e.el == el && e.callback == callback) {
+          events.splice(i, 1);
+        }
+      });
     }
   };
 
-  // element
-  var E = function (type, attrs, l) {
-    if (!(this instanceof E)) {
-      return new E(type, attrs, l);
-    }
-
-    this.type = type;
-    this.attrs = attrs;
-    this.l = l; // leonardo
-    this.l.elements.push(this);
-  }
-
-  E.prototype = {
-    attr: function (args) {
-      for (key in args) {
-        if (vattrs[key]) {
-          this.attrs[key] = args[key];
-        }
-      }
-      // redraw all elements
-      this.l.redraw();
-      return this;
-    },
-
-    draw: function () {
-      var a = this.attrs,
-          self = this;
-
-      this.l.ctx.beginPath();
-
-      if (a.fill) {
-        this.l.ctx.fillStyle = a.fill;
-      }
-
-      // TODO test for type?
-      if (this.type == "circle") {
-        this.l.ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2, true);
-        this.l.ctx.stroke();
-        this.l.ctx.fill();
-      }
-
-      if (this.type == "rect") {
-        //this.l.ctx.fillRect(a.x, a.y, a.w, a.h);
-        this.l.ctx.rect(a.x, a.y, a.w, a.h);
-        this.l.ctx.fill();
-
-        //this.l.ctx.strokeRect(a.x, a.y, a.w, a.h);
-      }
-
-      if (this.type == "path") {
-        this.attrs.path.forEach(this.processPath, this);
-        this.l.ctx.stroke();
-        this.l.ctx.fill();
-      }
-      this.l.ctx.closePath();
-    },
-
-    mouseover: function (callback) {
-      this.l.events.mo = this.l.events.mo || [];
-      this.l.events.mo.push([this, callback]);
-    },
-
-    processPath: function (p) {
-      for (c in p) {
-        pathCommands[c].call(this, p[c]);
-      }
-    }
+  L.toString = function () {
+    return "Leonardo ver. " + L.version;
   }
 
   // create canvas
@@ -179,15 +178,7 @@
     return c;
   }
 
-  this.Leonardo = L;
-
-  L.version = 0.1;
-
-  L.toString = function () {
-    return "Leonardo ver. " + L.version;
-  }
-
-  L.isInRange = function (el, pt) {
+  L.isPointInRange = function (el, pt) {
     if (el.type == "circle") {
       var dx = el.attrs.x - pt.x;
       var dy = el.attrs.y - pt.y;
@@ -214,5 +205,97 @@
       }
     }
     return true;
+  }
+
+  // element constructor
+  var E = function (type, attrs, l) {
+    if (!(this instanceof E)) {
+      return new E(type, attrs, l);
+    }
+
+    this.type = type;
+    this.attrs = attrs;
+    this.state = {}; // holds different element states
+    this.l = l;
+    this.events = l.events;
+    this.ctx = this.l.ctx;
+
+    // push element to leonardo
+    this.l.elements.push(this);
+  }
+
+  E.prototype = {
+    attr: function (args) {
+      for (key in args) {
+        if (vattrs[key]) {
+          this.attrs[key] = args[key];
+        }
+      }
+      // redraw all elements
+      this.redraw();
+      return this;
+    },
+
+    redraw: function () {
+      this.l.redraw();
+    },
+
+    draw: function () {
+      var a = this.attrs,
+          self = this;
+
+      this.ctx.beginPath();
+
+      if (a.fill) {
+        this.ctx.fillStyle = a.fill;
+      }
+
+      // TODO test for type?
+      if (this.type == "circle") {
+        this.ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2, true);
+        this.ctx.stroke();
+        this.ctx.fill();
+      }
+
+      if (this.type == "rect") {
+        this.ctx.rect(a.x, a.y, a.w, a.h);
+        this.ctx.fill();
+      }
+
+      if (this.type == "path") {
+        this.attrs.path.forEach(this.processPath, this);
+        this.ctx.stroke();
+        this.ctx.fill();
+      }
+      this.ctx.closePath();
+    },
+
+    bind: function (eventName, callback) {
+      this.l.bind(eventName, this, callback);
+      return this;
+    },
+
+    unbind: function (eventName, callback) {
+      this.l.unbind(eventName, this, callback);
+      return this;
+    },
+
+    processPath: function (p) {
+      for (c in p) {
+        pathCommands[c].call(this, p[c]);
+      }
+    }
+  }
+
+  // setup events api
+  for (var i = 0, l = events.length; i < l; i++) {
+    (function (eventName) {
+      E.prototype[eventName] = function (callback) {
+        this.bind(eventName, callback);
+      }
+      E.prototype["un" + eventName] = function (callback) {
+        this.unbind(eventName, callback);
+      }
+    })(events[i]);
   }
 }).call(this);

@@ -3,7 +3,6 @@
   <body>
     <script src="raphael.js"></script>
     <script src="leonardo.js"></script>
-
     <script>
       var paper = new Leonardo(100, 100, 300, 300);
       var circle = paper.circle(100, 100, 100);
@@ -11,10 +10,30 @@
 
       //var rect = paper.rect(0, 0, 100, 50);
       //rect.attr({fill: "#0000ff"});
-
-      circle.mouseover(function () {
+      var callback = function () {
         this.attr({fill: "#00ff00"});
+      }
+
+      circle.mouseover(callback);
+
+      //circle.unmouseover(callback);
+
+      circle.mouseout(function () {
+        this.attr({fill: "#ff0000"});
       });
+
+      //circle.click(function () {
+      //  this.attr({fill: "#fefefe"});
+     // });
+
+      circle.mousedown(function () {
+        this.attr({fill: "#fefefe"});
+      });
+
+      circle.mouseup(function () {
+        this.attr({fill: "#00fafe"});
+      });
+
 
       //var path = paper.path([{M:[10, 10]},{L:[100,10,100,100,150,150,10,100,10,10]}]);
       //path.attr({fill: "#00ff00"});
