@@ -46,6 +46,7 @@
             // drag
             if (el.flags.dragging) {
               el.attr(p);
+              L.is("Function", el.dragmove) && el.dragmove.call(el);
             }
             else {
               if (!j || i > j) {
@@ -73,6 +74,7 @@
           if (L.isPointInRange(el, p)) {
             if (el.dragstart) {
               el.flags.dragging = true;
+              el.toFront();
               L.is("Function", el.dragstart) && el.dragstart.call(el);
             }
             else {
@@ -97,7 +99,7 @@
 
         click: function (el, p) {
           if (L.isPointInRange(el, p)) {
-            el.mouseup.call(el);
+            el.click && el.click.call(el);
             return true;
           }
         }
@@ -174,7 +176,9 @@
       if (eventsMap[eventName]) {
         eventsMap[eventName].split(":").forEach(function (name) {
           self.events[name] = self.events[name] || [];
-          self.events[name].push(el);
+          if (self.events[name].length == 0 || self.events[name].indexOf(el) == -1) {
+            self.events[name].push(el);
+          }
         });
       }
       else {
@@ -219,6 +223,7 @@
         d.body.appendChild(c);
       }
     }
+
     return c;
   }
 
@@ -292,10 +297,8 @@
 
       this.ctx.beginPath();
 
-      // process events?????
       // http://digitalarts.bgsu.edu/faculty/bonniem/Spring11/artc4330_1/notes/notes26.html
       // isPointInPath
-      //
       //if (this.ctx.isPointInPath(x, y)) {
       //}
 
@@ -342,6 +345,33 @@
       return this;
     },
 
+    toFront: function () {
+      var index = this.l.elements.indexOf(this)
+        , self = this
+        , a = this.l.elements;
+
+      if (index < a.length - 1) {
+        a.splice(index, 1);
+        a.push(this);
+
+        cevents.forEach(function (name) {
+          var a = self.l.events[name]
+          if (a) {
+            var i = a.indexOf(self);
+            if (i < a.length) {
+              a.splice(i, 1);
+              a.push(self);
+            }
+          }
+        });
+
+        this.redraw();
+      }
+    },
+
+    toBack: function () {
+    },
+
     processPath: function (p) {
       for (c in p) {
         pathCommands[c].call(this, p[c]);
@@ -361,12 +391,9 @@
     })(events[i]);
   }
 
-  // setup leonard api
+  // setup leonardo api
   for (var i = 0, l = cevents.length; i < l; i++) {
-    (function (eventName) {
-      var map = eventName.split(':')
-        , name = map[1] || map[0];
-      // create leonardo event API
+    (function (name) {
       L.prototype[name] = function (e) {
         var p = this.getPos(e);
         this.events[name] = this.events[name] || []

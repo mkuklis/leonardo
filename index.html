@@ -34,46 +34,10 @@
       circle3.mouseout(function () {
         this.attr({fill: "#eeff00"});
       });
-      /*
-      circle3.drag(function () {
-        //this.attr({fill: "#eeff00"});
-      });
 
-      circle2.drag(function () {
-        //this.attr({fill: "#eeff00"});
-      });
-      */
-      circle3.drag(
-      function () {
-        console.log('dragging');
-      },
-      function () {
-        console.log('drag start');
-
-      },
-      function () {
-        console.log('drag end');
-      });
-
-
-
-
-
-      /*
-
-      circle.click(function () {
-        this.attr({fill: "#fefefe"});
-      });
-
-      circle.mousedown(function () {
-        this.attr({fill: "#fefefe"});
-      });
-      */
-      /*
-      circle.mouseup(function () {
-        this.attr({fill: "#00fafe"});
-      });
-*/
+      circle1.drag();
+      circle2.drag();
+      circle3.drag();
 
       //var path = paper.path([{M:[10, 10]},{L:[100,10,100,100,150,150,10,100,10,10]}]);
       //path.attr({fill: "#00ff00"});
