@@ -10,10 +10,11 @@
     // canvas events
     , cevents = "mousedown mouseup mousemove click".split(" ")
     // map canvas events to element events
-    , eventsMap = {
+    , map = {
         "mouseover": "mousemove",
         "dragmove": "mousemove",
         "dragstart": "mousedown",
+        "mouseout": "mousemove",
         "dragend": "mouseup"
       }
 
@@ -119,6 +120,7 @@
     // setup events
     for (var i = 0, l = cevents.length; i < l; i++) {
       (function (name) {
+        this.events[name] = [];
         this.canvas.addEventListener(name, L.proxy(function (e) { this[name](e);}, this), false);
       }).call(this, cevents[i]);
     }
@@ -171,28 +173,21 @@
       return {x: x, y: y};
     },
 
-    bind: function (eventName, el) {
-      var self = this;
-      if (eventsMap[eventName]) {
-        eventsMap[eventName].split(":").forEach(function (name) {
-          self.events[name] = self.events[name] || [];
-          if (self.events[name].length == 0 || self.events[name].indexOf(el) == -1) {
-            self.events[name].push(el);
-          }
-        });
-      }
-      else {
-        this.events[eventName] = this.events[eventName] || [];
-        this.events[eventName].push(el);
+    bind: function (n, el) {
+      var e = this.events
+        , n = (map[n]) ? map[n] : n;
+
+      if (e[n].length == 0 || e[n].indexOf(el) == -1) {
+        e[n].push(el);
       }
     },
 
-    unbind: function (eventName, el) {
-      var events = this.events[eventName];
-      events.forEach(function (e, i) {
-        if (e == el && el[eventName].callback == e[eventName].callback) {
-          delete el[eventName].callback;
-          events.splice(i, 1);
+    unbind: function (n, el) {
+      var e = this.events[n];
+      e.forEach(function (ell, i) {
+        if (ell == el) {
+          delete el[n];
+          e.splice(i, 1);
         }
       });
     }
@@ -355,7 +350,7 @@
         a.push(this);
 
         cevents.forEach(function (name) {
-          var a = self.l.events[name]
+          var a = self.l.events[name];
           if (a) {
             var i = a.indexOf(self);
             if (i < a.length) {
@@ -381,27 +376,26 @@
 
   // setup element events api
   for (var i = 0, l = events.length; i < l; i++) {
-    (function (eventName) {
-      E.prototype[eventName] = function (callback) {
-        this.bind(eventName, callback);
+    (function (n) {
+      E.prototype[n] = function (c) {
+        this.bind(n, c);
       }
-      E.prototype["un" + eventName] = function (callback) {
-        this.unbind(eventName, callback);
+      E.prototype["un" + n] = function (c) {
+        this.unbind(n, c);
       }
     })(events[i]);
   }
 
   // setup leonardo api
   for (var i = 0, l = cevents.length; i < l; i++) {
-    (function (name) {
-      L.prototype[name] = function (e) {
-        var p = this.getPos(e);
-        this.events[name] = this.events[name] || []
-        var events = this.events[name];
+    (function (n) {
+      L.prototype[n] = function (e) {
+        var p = this.getPos(e)
+          , events = this.events[n];
         // process elements for specific event
         for (var i = events.length - 1; i >= 0; i--) {
-          var el = events[i];
-          var val = handlers[name].call(this, el, p, i, events);
+          var el = events[i]
+            , val = handlers[n].call(this, el, p, i, events);
           if (val) {
             return true;
           }
