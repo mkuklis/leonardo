@@ -4,23 +4,62 @@
     <script src="raphael.js"></script>
     <script src="leonardo.js"></script>
     <script>
-      var paper = new Leonardo(100, 100, 300, 300);
-      var circle = paper.circle(100, 100, 100);
-      circle.attr({x: 150, y: 150, r: 50, fill: "#ff0000"}).attr({x: 100});
+      var paper = new Leonardo(0, 0, 800, 600);
 
-      //var rect = paper.rect(0, 0, 100, 50);
-      //rect.attr({fill: "#0000ff"});
+      var circle1 = paper.circle(150, 150, 50);
+      circle1.attr({fill: "#ff0000"});
+
+      var circle2 = paper.circle(175, 175, 50);
+      circle2.attr({fill: "#fefefe"});
+
+      var circle3 = paper.circle(200, 200, 50);
+      circle3.attr({fill: "#eeff00"});
+
       var callback = function () {
         this.attr({fill: "#00ff00"});
       }
 
-      circle.mouseover(callback);
+      circle1.mouseover(callback);
+      circle2.mouseover(callback);
+      circle3.mouseover(callback);
 
-      //circle.unmouseover(callback);
-
-      circle.mouseout(function () {
+      circle1.mouseout(function () {
         this.attr({fill: "#ff0000"});
       });
+
+      circle2.mouseout(function () {
+        this.attr({fill: "#fefefe"});
+      });
+
+      circle3.mouseout(function () {
+        this.attr({fill: "#eeff00"});
+      });
+      /*
+      circle3.drag(function () {
+        //this.attr({fill: "#eeff00"});
+      });
+
+      circle2.drag(function () {
+        //this.attr({fill: "#eeff00"});
+      });
+      */
+      circle3.drag(
+      function () {
+        console.log('dragging');
+      },
+      function () {
+        console.log('drag start');
+
+      },
+      function () {
+        console.log('drag end');
+      });
+
+
+
+
+
+      /*
 
       circle.click(function () {
         this.attr({fill: "#fefefe"});
@@ -29,11 +68,12 @@
       circle.mousedown(function () {
         this.attr({fill: "#fefefe"});
       });
-
+      */
+      /*
       circle.mouseup(function () {
         this.attr({fill: "#00fafe"});
       });
-
+*/
 
       //var path = paper.path([{M:[10, 10]},{L:[100,10,100,100,150,150,10,100,10,10]}]);
       //path.attr({fill: "#00ff00"});
