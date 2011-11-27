@@ -137,23 +137,23 @@
   L.prototype = {
     // create circle element
     circle: function (x, y, r) {
-      var attrs = {x: x || 0, y: y || 0, r: r || 0};
-      var circle = E('circle', attrs, this);
+      var attrs = {x: x || 0, y: y || 0, r: r || 0}
+        , circle = E('circle', attrs, this);
       circle.draw();
       return circle;
     },
 
     // create rect element
     rect: function (x, y, w, h, r) {
-      var attrs = {x: x || 0, y: y || 0, w: w || 0, h: h || 0, r: r || 0};
-      var rect = E('rect', attrs, this);
+      var attrs = {x: x || 0, y: y || 0, w: w || 0, h: h || 0, r: r || 0}
+        , rect = E('rect', attrs, this);
       rect.draw();
       return rect;
     },
 
     path: function (p) {
-      var attrs = {path: p};
-      var path = E('path', attrs, this);
+      var attrs = {path: p}
+        , path = E('path', attrs, this);
       path.draw();
       return path;
     },
@@ -261,6 +261,36 @@
     return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b);
   }
 
+  http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas
+  var CP = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
+  if (CP.lineTo) {
+    CP.dashedLine = function(x, y, x2, y2, da) {
+      var da = (!da) ? [10,5] : da
+        , dx = (x2 - x), dy = (y2 - y)
+        , len = Math.sqrt(dx * dx + dy * dy)
+        , rot = Math.atan2(dy, dx)
+        , dc = da.length
+        , di = 0
+        , draw = true;
+
+      this.save();
+      this.translate(x, y);
+      this.moveTo(0, 0);
+      this.rotate(rot);
+
+      x = 0;
+
+      while (len > x) {
+        x += da[di++ % dc];
+        if (x > len) x = len;
+        draw ? this.lineTo(x, 0) : this.moveTo(x, 0);
+        draw = !draw;
+      }
+
+      this.restore();
+    }
+  }
+
   // element constructor
   var E = function (type, attrs, leonardo) {
     if (!(this instanceof E)) {
@@ -300,8 +330,7 @@
     },
 
     draw: function () {
-      var a = this.attrs,
-          self = this;
+      var a = this.attrs;
 
       this.ctx.beginPath();
 
@@ -310,7 +339,7 @@
       }
 
       this.ctx.strokeStyle = (a.stroke) ? E.rgba(a.stroke, a['stroke-opacity']) : "#000000";
-      this.ctx.strokeWidth = a['stroke-width'] || 1;
+      this.ctx.lineWidth = a['stroke-width'] || 1.0;
 
       // TODO test for type?
       if (this.type == "circle") {
@@ -387,7 +416,6 @@
 
   // TODO: revisit
   E.hex2rgb = function (hex) {
-
     var hex = (hex[0] == "#") ? hex.substr(1) : hex;
 
     if (hex.length == 3) {
