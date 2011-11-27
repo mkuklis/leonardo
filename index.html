@@ -4,19 +4,17 @@
     <script src="raphael.js"></script>
     <script src="leonardo.js"></script>
     <script>
-      var paper = new Leonardo(0, 0, 800, 600);
 
+      var paper = new Leonardo(0, 0, 800, 600);
       var circle1 = paper.circle(150, 150, 50);
       circle1.attr({fill: "#ff0000"});
-
       var circle2 = paper.circle(175, 175, 50);
-      circle2.attr({fill: "#fefefe"});
-
+      circle2.attr({fill: "00ff00"});
       var circle3 = paper.circle(200, 200, 50);
-      circle3.attr({fill: "#eeff00"});
+      circle3.attr({fill: "0000ff"});
 
       var callback = function () {
-        this.attr({fill: "#00ff00"});
+        this.attr({fill: "#ffaaee"});
       }
 
       circle1.mouseover(callback);
@@ -28,11 +26,11 @@
       });
 
       circle2.mouseout(function () {
-        this.attr({fill: "#fefefe"});
+        this.attr({fill: "#00ff00"});
       });
 
       circle3.mouseout(function () {
-        this.attr({fill: "#eeff00"});
+        this.attr({fill: "#0000ff"});
       });
 
       circle1.drag();
@@ -41,6 +39,7 @@
 
       //var path = paper.path([{M:[10, 10]},{L:[100,10,100,100,150,150,10,100,10,10]}]);
       //path.attr({fill: "#00ff00"});
+      //path.drag();
     </script>
   </body>
 </html>

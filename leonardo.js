@@ -9,7 +9,7 @@
     , events = "mouseover mouseout mousedown mouseup click".split(" ")
     // canvas events
     , cevents = "mousedown mouseup mousemove click".split(" ")
-    // map canvas events to element events
+    // map element events to canvas events
     , map = {
         "mouseover": "mousemove",
         "dragmove": "mousemove",
@@ -41,26 +41,25 @@
     // canvas event handlers
     , handlers = {
         mousemove: function (el, p, i, elements) {
-          var j = this.flags.mouseover;
-          // mouseover
-          if ((!el.flags.over || el.flags.dragging) && L.isPointInRange(el, p)) {
-            // drag
-            if (el.flags.dragging) {
-              el.attr(p);
-              L.is("Function", el.dragmove) && el.dragmove.call(el);
-            }
-            else {
-              if (!j || i > j) {
-                if (i > j) {
-                  var prev = elements[j];
-                  prev.mouseout && prev.mouseout.call(prev);
-                  prev.flags.over = false;
-                }
 
-                el.mouseover && el.mouseover.call(el);
-                this.flags.mouseover = i;
-                el.flags.over = true;
+          var j = this.flags.mouseover;
+
+          // drag
+          if (el.flags.dragging) {
+            el.attr(p);
+          }
+          // mouseover
+          else if (!el.flags.over && L.isPointInRange(el, p)) {
+            if (!j || i > j || this.flags.dragging) {
+              if (i > j) {
+                var prev = elements[j];
+                prev.mouseout && prev.mouseout.call(prev);
+                prev.flags.over = false;
               }
+
+              el.mouseover && el.mouseover.call(el);
+              this.flags.mouseover = i;
+              el.flags.over = true;
             }
           }
           // mouseout
@@ -75,6 +74,7 @@
           if (L.isPointInRange(el, p)) {
             if (el.dragstart) {
               el.flags.dragging = true;
+              this.flags.dragging = true;
               el.toFront();
               L.is("Function", el.dragstart) && el.dragstart.call(el);
             }
@@ -89,12 +89,12 @@
           if (L.isPointInRange(el, p)) {
             if (el.dragend) {
               el.flags.dragging = false;
+              this.flags.dragging = false;
               L.is("Function", el.dragend) && el.dragend.call(el);
             }
             else {
               el.mouseup && el.mouseup.call(el);
             }
-            return true;
           }
         },
 
@@ -121,7 +121,7 @@
     for (var i = 0, l = cevents.length; i < l; i++) {
       (function (name) {
         this.events[name] = [];
-        this.canvas.addEventListener(name, L.proxy(function (e) { this[name](e);}, this), false);
+        this.canvas.addEventListener(name, L.proxy(function (e) { this[name](e); }, this), false);
       }).call(this, cevents[i]);
     }
   }
@@ -252,20 +252,24 @@
     return true;
   }
 
+  // uuid https://gist.github.com/982883
+  L.uuid = function b (a) {
+    return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b);
+  }
+
   // element constructor
-  var E = function (type, attrs, l) {
+  var E = function (type, attrs, leonardo) {
     if (!(this instanceof E)) {
-      return new E(type, attrs, l);
+      return new E(type, attrs, leonardo);
     }
 
     this.type = type;
     this.attrs = attrs;
     this.flags = {}; // holds different event ralated flags
-    this.l = l;
+    this.l = leonardo;
     this.ctx = this.l.ctx;
-
-    // push element to leonardo
-    this.l.elements.push(this);
+    var index = this.l.elements.push(this);
+    this.id = L.uuid();
   }
 
   E.prototype = {
@@ -328,38 +332,37 @@
       this.bind("dragend", end || true);
     },
 
-    bind: function (eventName, callback) {
-      this[eventName] = callback;
-      this.l.bind(eventName, this);
+    bind: function (name, callback) {
+      this[name] = callback;
+      this.l.bind(name, this);
       return this;
     },
 
-    unbind: function (eventName, callback) {
-      this[eventName] = callback;
-      this.l.unbind(eventName, this);
+    unbind: function (name, callback) {
+      this[name] = callback;
+      this.l.unbind(name, this);
       return this;
     },
 
     toFront: function () {
-      var index = this.l.elements.indexOf(this)
+      var i = this.l.elements.indexOf(this)
         , self = this
-        , a = this.l.elements;
+        , elems = this.l.elements;
 
-      if (index < a.length - 1) {
-        a.splice(index, 1);
-        a.push(this);
+      if (i < elems.length - 1) {
+        elems.splice(i, 1);
+        elems.push(this);
 
         cevents.forEach(function (name) {
-          var a = self.l.events[name];
-          if (a) {
-            var i = a.indexOf(self);
-            if (i < a.length) {
-              a.splice(i, 1);
-              a.push(self);
+          var e = self.l.events[name];
+          if (e) {
+            var i = e.indexOf(self);
+            if (i < e.length) {
+              e.splice(i, 1);
+              e.unshift(self);
             }
           }
         });
-
         this.redraw();
       }
     },
@@ -396,6 +399,7 @@
         for (var i = events.length - 1; i >= 0; i--) {
           var el = events[i]
             , val = handlers[n].call(this, el, p, i, events);
+
           if (val) {
             return true;
           }
