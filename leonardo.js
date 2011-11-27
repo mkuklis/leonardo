@@ -4,7 +4,7 @@
   var w = this
     , d = w.document
     // valid attributes
-    , vattrs = {x:1,y:1,dx:1,dy:1,r:1,w:1,h:1,fill:1,path:1,"stroke-width": 1}
+    , vattrs = {x:1,y:1,dx:1,dy:1,r:1,w:1,h:1,fill:1,path:1,opacity:1,"stroke-width": 1}
     // element events
     , events = "mouseover mouseout mousedown mouseup click".split(" ")
     // canvas events
@@ -307,13 +307,8 @@
 
       this.ctx.beginPath();
 
-      // http://digitalarts.bgsu.edu/faculty/bonniem/Spring11/artc4330_1/notes/notes26.html
-      // isPointInPath
-      //if (this.ctx.isPointInPath(x, y)) {
-      //}
-
       if (a.fill) {
-        this.ctx.fillStyle = a.fill;
+        this.ctx.fillStyle = E.rgba(a.fill, a.opacity);
       }
 
       // TODO test for type?
@@ -387,6 +382,33 @@
         pathCommands[c].call(this, p[c]);
       }
     }
+  }
+
+  // TODO: revisit
+  E.hex2rgb = function (hex) {
+
+    hex = (hex[0] == "#") ? hex.substr(1) : hex;
+
+    if (hex.length == 3) {
+      var temp = /^([a-f0-9])([a-f0-9])([a-f0-9])$/i.exec(hex).slice(1);
+      for (var i = 0; i < 3; i++) {
+        hex += temp[i] + temp[i];
+      }
+    }
+
+    var triplets = /^([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i.exec(hex).slice(1);
+
+    return {
+      r: parseInt(triplets[0], 16),
+      g: parseInt(triplets[1], 16),
+      b: parseInt(triplets[2], 16)
+    };
+  }
+
+  E.rgba = function (hex, opacity) {
+    var rgb = E.hex2rgb(hex);
+    var opacity = opacity || '0.0';
+    return "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")";
   }
 
   // setup element events api
