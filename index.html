@@ -1,39 +1,48 @@
 <html>
   <head></head>
   <body>
-    <script src="raphael.js"></script>
     <script src="leonardo.js"></script>
     <script>
 
       var paper = new Leonardo(0, 0, 800, 600);
 
-
-      var x = Math.floor(Math.random()*800);
-      var y = Math.floor(Math.random()*600);
-
       var circle1 = paper.circle(100, 100,  50);
       circle1.attr({fill: "#ff0000", opacity: 0.3});
-
       var circle2 = paper.circle(150, 100,  50);
       circle2.attr({fill: "#00ff00", opacity: 0.3});
-
       var circle3 = paper.circle(125, 150,  50);
       circle3.attr({fill: "#0000ff", opacity: 0.3});
 
-      var callback = function () {
-        this.attr({fill: "#ff0000", opacity: 1.0});
-      }
+      circle1
+        .mouseover(function () {
+          this.attr({fill: "#ff0000", stroke: "#ff0000", "stroke-opacity": 0.5, opacity: 0.8});
+        })
+        .mouseout(function () {
+          this.attr({opacity: 0.3});
+        })
+        .drag();
 
-      circle1.mouseover(callback);
 
-      circle1.mouseout(function () {
-        this.attr({fill: "#ff0000", opacity: 0.5});
-      });
+      circle2
+        .mouseover(function () {
+          this.attr({fill: "#00ff00", opacity: 0.8});
+        })
+        .mouseout(function () {
+          this.attr({opacity: 0.5});
+        })
+        .drag();
 
-      circle1.drag();
-      //var path = paper.path([{M:[10, 10]},{L:[100,10,100,100,150,150,10,100,10,10]}]);
-      //path.attr({fill: "#00ff00"});
-      //path.drag();
+
+      circle3
+        .mouseover(function () {
+          this.attr({fill: "#0000ff", opacity: 0.8});
+        })
+        .mouseout(function () {
+          this.attr({opacity: 0.5});
+        })
+        .drag();
+
+
     </script>
   </body>
 </html>

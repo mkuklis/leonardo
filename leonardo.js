@@ -4,7 +4,7 @@
   var w = this
     , d = w.document
     // valid attributes
-    , vattrs = {x:1,y:1,dx:1,dy:1,r:1,w:1,h:1,fill:1,path:1,opacity:1,"stroke-width": 1}
+    , vattrs = {x:1,y:1,dx:1,dy:1,r:1,w:1,h:1,fill:1,path:1,opacity:1,stroke: 1, "stroke-width":1, "stroke-opacity": 1}
     // element events
     , events = "mouseover mouseout mousedown mouseup click".split(" ")
     // canvas events
@@ -40,19 +40,17 @@
       }
     // canvas event handlers
     , handlers = {
-        mousemove: function (el, p, i, elements) {
-
-          var j = this.flags.mouseover;
-
+        mousemove: function (el, pt, i, elements) {
           // drag
           if (el.flags.dragging) {
-            el.attr(p);
+            el.attr(pt);
           }
           // mouseover
-          else if (!el.flags.over && L.isPointInRange(el, p)) {
-            if (!j || i > j || this.flags.dragging) {
-              if (i > j) {
-                var prev = elements[j];
+          else if (!el.flags.over && L.isPointInRange(el, pt)) {
+            var prevIndex = this.flags.mouseover;
+            if (!prevIndex || i > prevIndex || this.flags.dragging) {
+              if (i > prevIndex) {
+                var prev = elements[prevIndex];
                 prev.mouseout && prev.mouseout.call(prev);
                 prev.flags.over = false;
               }
@@ -64,20 +62,20 @@
             }
           }
           // mouseout
-          else if (el.flags.over && !L.isPointInRange(el, p)) {
+          else if (el.flags.over && !L.isPointInRange(el, pt)) {
             el.flags.over = false;
             el.mouseout && el.mouseout.call(el);
             delete this.flags.mouseover;
           }
         },
 
-        mousedown: function (el, p) {
-          if (L.isPointInRange(el, p)) {
+        mousedown: function (el, pt) {
+          if (L.isPointInRange(el, pt)) {
             if (el.dragstart) {
               el.flags.dragging = true;
               this.flags.dragging = true;
               el.toFront();
-              el.attr({dx: p.x - el.attrs.x, dy: p.y - el.attrs.y}, {silent: true});
+              el.attr({dx: pt.x - el.attrs.x, dy: pt.y - el.attrs.y}, {silent: true});
               L.is("Function", el.dragstart) && el.dragstart.call(el);
             }
             else {
@@ -87,14 +85,14 @@
           }
         },
 
-        mouseup: function (el, p) {
-          if (L.isPointInRange(el, p)) {
+        mouseup: function (el, pt) {
+          if (L.isPointInRange(el, pt)) {
             if (el.dragend && el.flags.dragging) {
               el.flags.dragging = false;
               this.flags.dragging = false;
               el.attr({
-                x: el.attrs.x - el.attrs.dx,
-                y: el.attrs.y - el.attrs.dy,
+                x: pt.x - el.attrs.dx,
+                y: pt.y - el.attrs.dy,
                 dx: 0, dy: 0},
                 {silent: true});
               L.is("Function", el.dragend) && el.dragend.call(el);
@@ -282,18 +280,18 @@
     constructor: E,
 
     attr: function (args, options) {
+      var options = options || {};
       for (key in args) {
         if (vattrs[key]) {
           this.attrs[key] = args[key];
         }
       }
 
-      var options = options || {};
-
       if (!options.silent) {
         // redraw all elements
         this.redraw();
       }
+
       return this;
     },
 
@@ -310,6 +308,9 @@
       if (a.fill) {
         this.ctx.fillStyle = E.rgba(a.fill, a.opacity);
       }
+
+      this.ctx.strokeStyle = (a.stroke) ? E.rgba(a.stroke, a['stroke-opacity']) : "#000000";
+      this.ctx.strokeWidth = a['stroke-width'] || 1;
 
       // TODO test for type?
       if (this.type == "circle") {
@@ -387,7 +388,7 @@
   // TODO: revisit
   E.hex2rgb = function (hex) {
 
-    hex = (hex[0] == "#") ? hex.substr(1) : hex;
+    var hex = (hex[0] == "#") ? hex.substr(1) : hex;
 
     if (hex.length == 3) {
       var temp = /^([a-f0-9])([a-f0-9])([a-f0-9])$/i.exec(hex).slice(1);
@@ -407,7 +408,7 @@
 
   E.rgba = function (hex, opacity) {
     var rgb = E.hex2rgb(hex);
-    var opacity = opacity || '0.0';
+    var opacity = opacity || '1.0';
     return "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")";
   }
 
