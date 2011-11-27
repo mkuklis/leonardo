@@ -9,12 +9,11 @@
       var circle1 = paper.circle(150, 150, 50);
       circle1.attr({fill: "#ff0000"});
       var circle2 = paper.circle(175, 175, 50);
-      circle2.attr({fill: "00ff00"});
+      circle2.attr({fill: "#fefefe"});
       var circle3 = paper.circle(200, 200, 50);
-      circle3.attr({fill: "0000ff"});
-
+      circle3.attr({fill: "#eeff00"});
       var callback = function () {
-        this.attr({fill: "#ffaaee"});
+        this.attr({fill: "#00ff00"});
       }
 
       circle1.mouseover(callback);
@@ -26,11 +25,11 @@
       });
 
       circle2.mouseout(function () {
-        this.attr({fill: "#00ff00"});
+        this.attr({fill: "#fefefe"});
       });
 
       circle3.mouseout(function () {
-        this.attr({fill: "#0000ff"});
+        this.attr({fill: "#eeff00"});
       });
 
       circle1.drag();

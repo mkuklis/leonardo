@@ -4,7 +4,7 @@
   var w = this
     , d = w.document
     // valid attributes
-    , vattrs = {x:1,y:1,cx:1,cy:1,r:1,w:1,h:1,fill:1,path:1,"stroke-width": 1}
+    , vattrs = {x:1,y:1,dx:1,dy:1,r:1,w:1,h:1,fill:1,path:1,"stroke-width": 1}
     // element events
     , events = "mouseover mouseout mousedown mouseup click".split(" ")
     // canvas events
@@ -60,6 +60,7 @@
               el.mouseover && el.mouseover.call(el);
               this.flags.mouseover = i;
               el.flags.over = true;
+              return true;
             }
           }
           // mouseout
@@ -76,6 +77,7 @@
               el.flags.dragging = true;
               this.flags.dragging = true;
               el.toFront();
+              el.attr({dx: p.x - el.attrs.x, dy: p.y - el.attrs.y}, {silent: true});
               L.is("Function", el.dragstart) && el.dragstart.call(el);
             }
             else {
@@ -87,9 +89,14 @@
 
         mouseup: function (el, p) {
           if (L.isPointInRange(el, p)) {
-            if (el.dragend) {
+            if (el.dragend && el.flags.dragging) {
               el.flags.dragging = false;
               this.flags.dragging = false;
+              el.attr({
+                x: el.attrs.x - el.attrs.dx,
+                y: el.attrs.y - el.attrs.dy,
+                dx: 0, dy: 0},
+                {silent: true});
               L.is("Function", el.dragend) && el.dragend.call(el);
             }
             else {
@@ -224,9 +231,8 @@
 
   L.isPointInRange = function (el, pt) {
     if (el.type == "circle") {
-      var dx = el.attrs.x - pt.x;
-      var dy = el.attrs.y - pt.y;
-      return dx * dx + dy * dy <= el.attrs.r * el.attrs.r
+      var d = Math.pow(el.attrs.x - pt.x, 2) + Math.pow(el.attrs.y - pt.y, 2);
+      return d <= el.attrs.r * el.attrs.r;
     }
     else {
       for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i) {
@@ -275,14 +281,19 @@
   E.prototype = {
     constructor: E,
 
-    attr: function (args) {
+    attr: function (args, options) {
       for (key in args) {
         if (vattrs[key]) {
           this.attrs[key] = args[key];
         }
       }
-      // redraw all elements
-      this.redraw();
+
+      var options = options || {};
+
+      if (!options.silent) {
+        // redraw all elements
+        this.redraw();
+      }
       return this;
     },
 
@@ -307,7 +318,7 @@
 
       // TODO test for type?
       if (this.type == "circle") {
-        this.ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2, true);
+        this.ctx.arc(a.x - (a.dx || 0), a.y - (a.dy || 0), a.r, 0, Math.PI * 2, true);
         this.ctx.stroke();
         this.ctx.fill();
       }
@@ -351,7 +362,7 @@
 
       if (i < elems.length - 1) {
         elems.splice(i, 1);
-        elems.push(this);
+        var index = elems.push(this);
 
         cevents.forEach(function (name) {
           var e = self.l.events[name];
@@ -359,10 +370,11 @@
             var i = e.indexOf(self);
             if (i < e.length) {
               e.splice(i, 1);
-              e.unshift(self);
+              e.push(self);
             }
           }
         });
+        this.l.flags.mouseover = index;
         this.redraw();
       }
     },
@@ -382,9 +394,11 @@
     (function (n) {
       E.prototype[n] = function (c) {
         this.bind(n, c);
+        return this;
       }
       E.prototype["un" + n] = function (c) {
         this.unbind(n, c);
+        return this;
       }
     })(events[i]);
   }
