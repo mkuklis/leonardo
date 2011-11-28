@@ -17,7 +17,6 @@
         "mouseout": "mousemove",
         "dragend": "mouseup"
       }
-
     // path commands
     , pathCommands = {
         M: function (v) {
@@ -258,10 +257,10 @@
 
   // uuid https://gist.github.com/982883
   L.uuid = function b (a) {
-    return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b);
+    return a ? (a^Math.random()*16>>a/4).toString(16) : ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, b);
   }
 
-  http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas
+  // http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas
   var CP = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
   if (CP.lineTo) {
     CP.dashedLine = function(x, y, x2, y2, da) {
@@ -335,10 +334,11 @@
       this.ctx.beginPath();
 
       if (a.fill) {
-        this.ctx.fillStyle = E.rgba(a.fill, a.opacity);
+        this.ctx.fillStyle = this.createStyle();
       }
 
-      this.ctx.strokeStyle = (a.stroke) ? E.rgba(a.stroke, a['stroke-opacity']) : "#000000";
+      a.stroke = a.stroke || '#000000';
+      this.ctx.strokeStyle = C.toColor(a.stroke, a['stroke-opacity']);
       this.ctx.lineWidth = a['stroke-width'] || 1.0;
 
       // TODO test for type?
@@ -358,8 +358,48 @@
         this.ctx.stroke();
         this.ctx.fill();
       }
-
       this.ctx.closePath();
+    },
+
+    createStyle: function () {
+      var a = this.attrs;
+
+      if (E.isGradient(a.fill)) {
+        return this.parseGradient(a.fill);
+      }
+
+      return C.toColor(a.fill, a.opacity);
+    },
+
+    parseGradient: function (str) {
+      var g = str.split(":")
+        , a = this.attrs
+        , type = g.shift()
+        , last = g[g.length - 1];
+
+      if (last.indexOf('-') == -1) {
+        var args = g.pop().split(',');
+      }
+
+      // radial
+      if (type === "r") {
+        args = (args) ? args : [a.x, a.y, 0, a.x, a.y, a.r];
+        var gr = this.ctx.createRadialGradient.apply(this.ctx, args);
+      }
+      // linear
+      else {
+        var args = (args) ? args : [a.x, a.y, a.w, a.h];
+        var gr = this.ctx.createLinearGradient.apply(this.ctx, args);
+      }
+
+      // process position-color
+      for (var i = 0, l = g.length; i < l; i++) {
+        var pc = g[i].split('-');
+        console.log(C.toColor(pc[1]));
+        gr.addColorStop(pc[0], C.toColor(pc[1]));
+      }
+
+      return gr;
     },
 
     drag: function (drag, start, end) {
@@ -414,30 +454,77 @@
     }
   }
 
-  // TODO: revisit
-  E.hex2rgb = function (hex) {
-    var hex = (hex[0] == "#") ? hex.substr(1) : hex;
+  // colors helpers
+  var C = {
+    rgbRegex: /^rgb\(([0-255]{1,3}),\s*([0-255]{1,3}),\s*([0-255]{1,3})\)$/ig,
+    singleHexRegex: /^([a-f0-9])([a-f0-9])([a-f0-9])$/i,
+    tripleHexRegex: /^([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i,
 
-    if (hex.length == 3) {
-      var temp = /^([a-f0-9])([a-f0-9])([a-f0-9])$/i.exec(hex).slice(1);
-      for (var i = 0; i < 3; i++) {
-        hex += temp[i] + temp[i];
+    hex2rgb: function (hex) {
+      var hex = (hex[0] == "#") ? hex.substr(1) : hex;
+
+      if (hex.length == 3) {
+        var temp = this.singleHexRegex.exec(hex).slice(1);
+        for (var i = 0; i < 3; i++) {
+          hex += temp[i] + temp[i];
+        }
       }
+
+      var triplets = this.tripleHexRegex.exec(hex).slice(1);
+
+      return {
+        r: parseInt(triplets[0], 16),
+        g: parseInt(triplets[1], 16),
+        b: parseInt(triplets[2], 16)
+      };
+    },
+
+    txt2rgb: function (txtColor) {
+      var el = d.getElementById('txt2rgb');
+      if (!el) {
+        el = d.createElement("div");
+        attr = d.createAttribute('id');
+        attr.value = 'txt2rgb';
+        el.setAttributeNode(attr);
+        el.style.display = "none";
+        d.body.appendChild(el);
+      }
+
+      el.style.color = txtColor;
+      return ww.getComputedStyle(el).color;
+    },
+
+    rgb2rgba: function (rgb, opacity) {
+      var rgb = this.rgbRegex.exec(color);
+      if (rgb && rgb.length == 4) {
+        return "rgba(" + rgb[1] + ", " + rgb[2] + ", " + rgb[3] + ", " + opacity + ")";
+      }
+      return rgb;
+    },
+
+    // converts given color to rgba if opacity is present
+    toColor: function (color, opacity) {
+      if (typeof opacity != "undefined") {
+        if (color.indexOf('rgba') > -1) {
+          return color;
+        }
+        else if (color.charAt() === "#") {
+          var rgb = this.hex2rgb(color);
+          return "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")";
+        }
+        else if (color.indexOf('rgb') > -1) {
+          return this.rgb2rgba(color);
+        }
+        else {
+          return this.rgb2rgba(this.txt2rgb(color));
+        }
+      }
+      return color;
     }
+  };
 
-    var triplets = /^([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i.exec(hex).slice(1);
-
-    return {
-      r: parseInt(triplets[0], 16),
-      g: parseInt(triplets[1], 16),
-      b: parseInt(triplets[2], 16)
-    };
-  }
-
-  E.rgba = function (hex, opacity) {
-    var rgb = E.hex2rgb(hex);
-    var opacity = opacity || '1.0';
-    return "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")";
+  E.isGradient = function (str) {
+    return str[0] == "r" || str[0] == "l";
   }
 
   // setup element events api
