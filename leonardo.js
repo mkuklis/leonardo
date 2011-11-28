@@ -82,6 +82,7 @@
             }
             return true;
           }
+
         },
 
         mouseup: function (el, pt) {
@@ -311,11 +312,22 @@
     constructor: E,
 
     attr: function (args, options) {
+
+      if (L.is('String', args)) {
+        return this.attrs[args];
+      }
+
+      if (L.is('Array', args)) {
+        var result = [];
+        for (var i = 0, l = args.length; i < l; i++) {
+          result.push(this.attrs[args[i]]);
+        }
+        return result;
+      }
+
       var options = options || {};
       for (key in args) {
-        //if (vattrs[key]) {
-          this.attrs[key] = args[key];
-        //}
+        this.attrs[key] = args[key];
       }
 
       if (!options.silent) {
@@ -346,28 +358,25 @@
       // TODO test for type?
       if (this.type == "circle") {
         this.ctx.arc(a.x - a.dx, a.y - a.dy, a.r, 0, Math.PI * 2, true);
-        this.ctx.stroke();
-        this.ctx.fill();
       }
 
       if (this.type == "rect") {
         this.ctx.rect(a.x, a.y, a.w, a.h);
-        this.ctx.fill();
       }
 
       if (this.type == "path") {
         this.attrs.path.forEach(this.processPath, this);
-        this.ctx.stroke();
-        this.ctx.fill();
       }
 
-            // text
+      this.ctx.stroke();
+      this.ctx.fill();
+
+      // text
       if (a.text) {
         this.processText();
       }
 
       this.ctx.closePath();
-
     },
 
     createStyle: function () {
@@ -432,6 +441,7 @@
       this.bind("dragmove", drag || true);
       this.bind("dragstart", start || true);
       this.bind("dragend", end || true);
+      return this;
     },
 
     bind: function (name, callback) {
@@ -453,7 +463,7 @@
 
       if (i < elems.length - 1) {
         elems.splice(i, 1);
-        var index = elems.push(this);
+        elems.push(this);
 
         cevents.forEach(function (name) {
           var e = self.l.events[name];
@@ -465,12 +475,18 @@
             }
           }
         });
-        this.l.flags.mouseover = index;
+        this.l.flags.mouseover = i;
         this.redraw();
       }
     },
 
     toBack: function () {
+      var index = this.l.elements.indexOf(this)
+        , elems = this.l.elements;
+
+      elems.splice(index, 1);
+      elems.unshift(this);
+      this.redraw();
     },
 
     processPath: function (p) {
