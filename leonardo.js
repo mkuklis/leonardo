@@ -3,7 +3,7 @@
   // global
   var w = this
     , d = w.document
-    // valid attributes
+    // valid attribute
     //, vattrs = {x:1,y:1,dx:1,dy:1,r:1,w:1,h:1,fill:1,path:1,opacity:1,stroke: 1, "stroke-width":1, "stroke-opacity": 1}
     // element events
     , events = "mouseover mouseout mousedown mouseup click".split(" ")
@@ -39,7 +39,7 @@
       }
     // canvas event handlers
     , handlers = {
-        mousemove: function (el, pt, i, elements) {
+        mousemove: function (el, pt, curIndex, elements) {
           // drag
           if (el.flags.dragging) {
             el.attr(pt);
@@ -47,15 +47,15 @@
           // mouseover
           else if (!el.flags.over && L.isPointInRange(el, pt)) {
             var prevIndex = this.flags.mouseover;
-            if (!prevIndex || i > prevIndex || this.flags.dragging) {
-              if (i > prevIndex) {
+            if (!prevIndex || curIndex > prevIndex || this.flags.dragging) {
+              if (curIndex > prevIndex) {
                 var prev = elements[prevIndex];
                 prev.mouseout && prev.mouseout.call(prev);
                 prev.flags.over = false;
               }
 
               el.mouseover && el.mouseover.call(el);
-              this.flags.mouseover = i;
+              this.flags.mouseover = curIndex;
               el.flags.over = true;
               return true;
             }
@@ -82,7 +82,6 @@
             }
             return true;
           }
-
         },
 
         mouseup: function (el, pt) {
@@ -136,9 +135,9 @@
 
   L.prototype = {
     // create circle element
-    circle: function (x, y, r) {
-      var attrs = {x: x || 0, y: y || 0, r: r || 0}
-        , circle = E('circle', attrs, this);
+    circle: function (x, y, r, attrs) {
+      var pos = {x: x || 0, y: y || 0, r: r || 0}
+        , circle = E('circle', L.extend(pos, attrs), this);
       circle.draw();
       return circle;
     },
@@ -151,10 +150,18 @@
       return rect;
     },
 
-    path: function (p) {
-      var attrs = {path: p}
-        , path = E('path', attrs, this);
-      path.draw();
+    path: function (attrs, options) {
+      if (L.is('Array', attrs)) {
+        var attrs = {path: attrs};
+      }
+
+      var options = options || {};
+      var path = E('path', attrs, this, options);
+
+      if (!options.silent) {
+        path.draw();
+      }
+
       return path;
     },
 
@@ -242,6 +249,15 @@
     }
   }
 
+  L.extend = function(obj) {
+    [].slice.call(arguments, 1).forEach(function(source) {
+      for (var prop in source) {
+        if (source[prop] !== void 0) obj[prop] = source[prop];
+      }
+    });
+    return obj;
+  };
+
   L.is = function (type, obj) {
     var clas = Object.prototype.toString.call(obj).slice(8, -1);
     return obj !== undefined && obj !== null && clas === type;
@@ -292,9 +308,9 @@
   }
 
   // element constructor
-  var E = function (type, attrs, leonardo) {
+  var E = function (type, attrs, leonardo, options) {
     if (!(this instanceof E)) {
-      return new E(type, attrs, leonardo);
+      return new E(type, attrs, leonardo, options);
     }
 
     this.type = type;
@@ -304,7 +320,16 @@
     this.flags = {}; // holds different event ralated flags
     this.l = leonardo;
     this.ctx = this.l.ctx;
-    var index = this.l.elements.push(this);
+
+    var options = options || {};
+
+    if (options.back) {
+      this.l.elements.unshift(this);
+    }
+    else {
+      this.l.elements.push(this);
+    }
+
     this.id = L.uuid();
   }
 
@@ -469,7 +494,7 @@
           var e = self.l.events[name];
           if (e) {
             var i = e.indexOf(self);
-            if (i < e.length) {
+            if (i > -1 && i != e.length - 1) {
               e.splice(i, 1);
               e.push(self);
             }
@@ -603,5 +628,4 @@
       }
     })(cevents[i]);
   }
-
 }).call(this);
