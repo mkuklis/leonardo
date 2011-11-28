@@ -7,7 +7,12 @@
       var paper = new Leonardo(0, 0, 800, 600);
 
       var circle1 = paper.circle(100, 100, 50);
-      circle1.attr({fill: "r:0-#A7D30C:0.9-#019F62:1-rgba(1,159,98,0)", "stroke-opacity": 0.0})
+      circle1.attr({
+        fill: "r:0-#A7D30C:0.9-#019F62:1-rgba(1,159,98,0)",
+        "stroke-opacity": 0.0,
+        text: "ala",
+        font: 'bold 15px Arial',
+        'font-color': 'red'})
         .drag();
 /*
       var circle2 = paper.circle(150, 100,  50);

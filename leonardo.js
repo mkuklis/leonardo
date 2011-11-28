@@ -360,7 +360,14 @@
         this.ctx.stroke();
         this.ctx.fill();
       }
+
+            // text
+      if (a.text) {
+        this.processText();
+      }
+
       this.ctx.closePath();
+
     },
 
     createStyle: function () {
@@ -371,6 +378,24 @@
       }
 
       return C.toColor(a.fill, a.opacity);
+    },
+
+    processText: function () {
+      var attrs = this.attrs
+        , pos = attrs['text-position'] || "center:middle"
+        , color = attrs['font-color'] || 'rgba(0,0,0,1.0)'
+        , font = attrs.font || "10px sans-serif"
+        , aligns = pos.split(':');
+
+      if (aligns.length == 1) {
+        aligns.push('middle');
+      }
+
+      this.ctx.textAlign = aligns[0];
+      this.ctx.textBaseline = aligns[1];
+      this.ctx.fillStyle = color;
+      this.ctx.font = font;
+      this.ctx.fillText(attrs.text, attrs.x - attrs.dx, attrs.y - attrs.dy);
     },
 
     parseGradient: function (str) {
@@ -467,7 +492,7 @@
       if (hex.length == 3) {
         var temp = this.singleHexRegex.exec(hex).slice(1);
         for (var i = 0; i < 3; i++) {
-          hex += temp[i] + temp[i];
+          hex += temp[i];
         }
       }
 
@@ -480,6 +505,8 @@
       };
     },
 
+    //TODO: IE support
+    // http://dean.edwards.name/weblog/2009/10/convert-any-colour-value-to-hex-in-msie/
     txt2rgb: function (txtColor) {
       var el = d.getElementById('txt2rgb');
       if (!el) {
