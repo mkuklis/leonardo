@@ -4,7 +4,7 @@
   var w = this
     , d = w.document
     // valid attributes
-    , vattrs = {x:1,y:1,dx:1,dy:1,r:1,w:1,h:1,fill:1,path:1,opacity:1,stroke: 1, "stroke-width":1, "stroke-opacity": 1}
+    //, vattrs = {x:1,y:1,dx:1,dy:1,r:1,w:1,h:1,fill:1,path:1,opacity:1,stroke: 1, "stroke-width":1, "stroke-opacity": 1}
     // element events
     , events = "mouseover mouseout mousedown mouseup click".split(" ")
     // canvas events
@@ -298,6 +298,8 @@
 
     this.type = type;
     this.attrs = attrs;
+    this.attrs.dx = 0;
+    this.attrs.dy = 0;
     this.flags = {}; // holds different event ralated flags
     this.l = leonardo;
     this.ctx = this.l.ctx;
@@ -311,9 +313,9 @@
     attr: function (args, options) {
       var options = options || {};
       for (key in args) {
-        if (vattrs[key]) {
+        //if (vattrs[key]) {
           this.attrs[key] = args[key];
-        }
+        //}
       }
 
       if (!options.silent) {
@@ -343,7 +345,7 @@
 
       // TODO test for type?
       if (this.type == "circle") {
-        this.ctx.arc(a.x - (a.dx || 0), a.y - (a.dy || 0), a.r, 0, Math.PI * 2, true);
+        this.ctx.arc(a.x - a.dx, a.y - a.dy, a.r, 0, Math.PI * 2, true);
         this.ctx.stroke();
         this.ctx.fill();
       }
@@ -383,19 +385,18 @@
 
       // radial
       if (type === "r") {
-        args = (args) ? args : [a.x, a.y, 0, a.x, a.y, a.r];
-        var gr = this.ctx.createRadialGradient.apply(this.ctx, args);
+        var args = (args) ? args : [a.x - a.dx, a.y - a.dy, 0, a.x - a.dx, a.y - a.dy, a.r]
+           , gr = this.ctx.createRadialGradient.apply(this.ctx, args);
       }
       // linear
       else {
-        var args = (args) ? args : [a.x, a.y, a.w, a.h];
-        var gr = this.ctx.createLinearGradient.apply(this.ctx, args);
+        var args = (args) ? args : [a.x, a.y, a.w, a.h]
+          , gr = this.ctx.createLinearGradient.apply(this.ctx, args);
       }
 
       // process position-color
       for (var i = 0, l = g.length; i < l; i++) {
         var pc = g[i].split('-');
-        console.log(C.toColor(pc[1]));
         gr.addColorStop(pc[0], C.toColor(pc[1]));
       }
 
