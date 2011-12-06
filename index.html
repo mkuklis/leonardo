@@ -1,16 +1,37 @@
 <html>
   <head></head>
   <body>
-    <script src="leonardo.js"></script>
+    <script src="leonardo/leonardo.js"></script>
+    <script src="leonardo/element.js"></script>
+    <script src="leonardo/color.js"></script>
+    <script src="leonardo/matrix.js"></script>
+
+    <script src="raphael.js"></script>
+
     <script>
-      var paper = new Leonardo(0, 0, 800, 600);
+
+      var paper = new Leonardo(0, 0, 320, 240);
+      var rect = paper.rect(100, 100, 50, 50).drag();
+      //console.log(rect);
+
+      //rect.drag();
+  //    var angle = 45;
+      // var circle = paper.circle(100, 100, 50).drag();
+      // paper.circle(25, 25, 25).drag();
+      // rect.drag();
+      //setInterval(function () {
+      //rect.rotate(angle++);
+      //rect.drag();
+      //}, 10);
+
+      /*
       var circle1 = paper.circle(100, 100, 12, {
         fill: "r:0-#A7D30C:0.9-#019F62:1-rgba(1,159,98,0)",
         "stroke-opacity": 0.0,
         text: "1",
         font: 'bold 15px Arial',
-        'font-color': 'red'}, {redraw: false})
-      .drag();
+        'font-color': 'red'}, {redraw: false});
+      //.drag();
 
       var circle2 = paper.circle(10, 10, 12,{
         fill: "r:0-#A7D30C:0.9-#019F62:1-rgba(1,159,98,0)",
@@ -18,7 +39,7 @@
         text: "2",
         font: 'bold 15px Arial',
         'font-color': 'red'})
-      .click(function () {
+      .touch(function () {
 
         var s = circle1.attr(['x','y']);
         var e = this.attr(['x','y']);
@@ -39,7 +60,7 @@
 
         paper.path([{M:[x1, y1]},{L: [x2, y2]}]);
       });
-
+*/
 /*
       var circle2 = paper.circle(150, 100,  50);
       circle2.attr({fill: "#00ff00", stroke: "#00ff00", opacity: 0.3});
