@@ -271,6 +271,24 @@
       return this;
     },
 
+    scale: function (sx, sy, cx, cy) {
+      var a = this.attrs;
+
+      if (cx == undefined) {
+        cx = a.w/2;
+        cy = a.h/2;
+      }
+
+      a.cx = cx;
+      a.cy = cy;
+      a.tx = -cx;
+      a.ty = -cy;
+
+      this.t.push({c:"scale", sx: sx, sy: sy, cx: cx, cy: cy});
+      this.redraw();
+      return this;
+    },
+
     transform: function () {
       var a = this.attrs;
       this.m.reset();
