@@ -2,16 +2,16 @@
   <head></head>
   <body>
     <script src="leonardo/leonardo.js"></script>
-    <script src="leonardo/element.js"></script>
     <script src="leonardo/color.js"></script>
+    <script src="leonardo/element.js"></script>
     <script src="leonardo/matrix.js"></script>
-
-    <script src="raphael.js"></script>
-
+    <!-- <script src="raphael.js"></script> -->
     <script>
 
-      var paper = new Leonardo(0, 0, 320, 240);
-      var rect = paper.rect(100, 100, 50, 50).drag();
+      var paper = new Leonardo(0, 0, 500, 500);
+      var rect1 = paper.rect(50, 50, 50, 50).attr({fill: '#ff0000'}).drag().rotate(45);
+      var rect2 = paper.rect(150, 150, 50, 50).drag().rotate(45);
+
       //console.log(rect);
 
       //rect.drag();

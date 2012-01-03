@@ -1,6 +1,22 @@
 (function (L) {
 
-  var events = "mouseover mouseout mousedown mouseup click".split(" ");
+  var events = "mouseover mouseout mousedown mouseup click".split(" "),
+      // transformation commands executed in the context of element
+      transCommands = {
+        rotate: function (t) {
+          this.m.rotate(t.angle);
+          this.ctx.rotate(t.angle * Math.PI / 180);
+          var a = this.attrs;
+          this.coords = [[-t.cx, -t.cy], [-t.cx + a.w, -t.cy], [-t.cx + a.w, -t.cy + a.h], [-t.cx, -t.cy + a.h]];
+        },
+        scale: function (t) {
+          this.m.scale(t.sx, t.sy);
+          this.ctx.scale(t.sx, t.sy);
+          var a = this.attrs;
+          this.coords = [[-t.cx, -t.cy], [-t.cx + a.w, -t.cy], [-t.cx + a.w, -t.cy + a.h], [-t.cx, -t.cy + a.h]];
+        }
+      };
+
 
   // element constructor
   var E = function (type, attrs, leonardo, options) {
@@ -16,8 +32,9 @@
     this.flags = {}; // event related flags
     this.l = leonardo;
     this.ctx = this.l.ctx;
-    this.m = new L.Matrix();
-
+    this.m = new L.Matrix(); // transformation matrix
+    this.t = []; // tansformations
+    this.coords = [];
     var options = options || {};
 
     if (options.back) {
@@ -28,8 +45,6 @@
     }
 
     this.id = L.uuid();
-    this.updateCoords();
-
   }
 
   E.prototype = {
@@ -70,6 +85,10 @@
     draw: function () {
       var a = this.attrs;
 
+      if (this.t.length) {
+        this.ctx.save();
+      }
+
       this.ctx.beginPath();
 
       if (a.fill) {
@@ -80,12 +99,18 @@
       this.ctx.strokeStyle = L.C.toColor(a.stroke, a['stroke-opacity']);
       this.ctx.lineWidth = a['stroke-width'] || 1.0;
 
+      if (this.t.length) {
+        this.transform();
+      }
+
+
       if (this.type == "circle") {
         this.ctx.arc(a.x - a.dx, a.y - a.dy, a.r, 0, Math.PI * 2, true);
       }
 
       if (this.type == "rect") {
-        this.ctx.rect(a.x - a.dx, a.y - a.dy, a.w, a.h);
+        this.ctx.rect(-a.cx, -a.cy, a.w, a.h);
+        //this.ctx.rect(a.x - a.dx, a.y - a.dy, a.w, a.h);
       }
 
       if (this.type == "path") {
@@ -101,6 +126,11 @@
       }
 
       this.ctx.closePath();
+
+      if (this.t.length) {
+        this.ctx.restore();
+      }
+
     },
 
     createStyle: function () {
@@ -110,7 +140,7 @@
         return this.parseGradient(a.fill);
       }
 
-      return C.toColor(a.fill, a.opacity);
+      return L.C.toColor(a.fill, a.opacity);
     },
 
     processText: function () {
@@ -197,16 +227,16 @@
         elems.splice(i, 1);
         elems.push(this);
 
-        cevents.forEach(function (name) {
-          var e = self.l.events[name];
+        events.forEach(function (name) {
+          var e = this.l.events[name];
           if (e) {
-            var i = e.indexOf(self);
+            var i = e.indexOf(this);
             if (i > -1 && i != e.length - 1) {
               e.splice(i, 1);
-              e.push(self);
+              e.push(this);
             }
           }
-        });
+        }, this);
 
         this.l.flags.mouseover = i;
         this.redraw();
@@ -228,26 +258,18 @@
       }
     },
 
-    updateCoords: function (x, y) {
-
-      if (x && y) {
-        this.attrs.x = x;
-        this.attrs.y = y;
-      }
-
-      if (this.type == "rect") {
-        var x = this.attrs.x
-          , y = this.attrs.y
-          , w = this.attrs.w
-          , h = this.attrs.h;
-
-        this.coords = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
-      }
-    },
-
-    rotate: function (degree, cx, cy) {
+    rotate: function (angle, cx, cy) {
       var a = this.attrs;
 
+      if (cx == undefined) {
+        cx = a.w/2;
+        cy = a.h/2;
+      }
+
+      a.cx = cx;
+      a.cy = cy;
+
+      /*
       if (!a.cx) {
         if (cx && cy) {
           a.cx = a.x + cx;
@@ -258,33 +280,33 @@
           a.cy = a.y + a.h/2;
         }
       }
+      */
 
-      this.l.clear();
-      this.ctx.save();
-
-      this.ctx.translate(a.cx, a.cx);
-      a.x = - a.w / 2;
-      a.y = - a.h / 2;
-      this.ctx.rotate(degree * Math.PI / 180);
-      //this.redraw();
-      //this.l.clear();
+      this.t.push({c: 'rotate', angle: angle, cx: cx, cy: cy});
       this.draw();
-      this.ctx.restore();
-      this.transform('translate', a.cx, a.cx);
-      this.transform('rotate', degree);
-      //this.l.clear();
-      //this.draw();
+      return this;
     },
 
-    transform: function (command, degree) {
-      var self = this;
-      this.coords.forEach(function (pt) {
-        self.m[command](pt[0], pt[1], degree);
-        var x = self.m.x(pt[0], pt[1]);
-        var y = self.m.y(pt[0], pt[1]);
-        pt[0] = x;
-        pt[1] = y;
-      });
+    transform: function () {
+      var a = this.attrs;
+      this.m.reset();
+      this.m.translate(a.x + a.cx, a.y + a.cy);
+      this.ctx.translate(a.x + a.cx, a.y + a.cy);
+
+      this.t.forEach(function (t) {
+        // process tansformations
+        transCommands[t.c].call(this, t);
+      }, this);
+
+      this.updateCoords();
+    },
+
+    updateCoords: function () {
+      var coords = this.coords;
+      coords.forEach(function (c, i) {
+        var p =this.m.xy(c[0], c[1]);
+        this.coords[i] = p;
+      }, this);
     }
   }
 
@@ -308,5 +330,4 @@
       }
     })(events[i]);
   }
-
 })(Leonardo);

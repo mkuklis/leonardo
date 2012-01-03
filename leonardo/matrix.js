@@ -20,6 +20,15 @@
   }
 
   Matrix.prototype =  {
+    reset: function () {
+      this.a = 1;
+      this.b = 0;
+      this.c = 0;
+      this.d = 1;
+      this.e = 0;
+      this.f = 0;
+    },
+
     add: function (a, b, c, d, e, f) {
       var out = [[], [], []],
           m = [[this.a, this.c, this.e], [this.b, this.d, this.f], [0, 0, 1]],
@@ -63,10 +72,10 @@
     },
 
     scale: function (x, y, cx, cy) {
-        y == null && (y = x);
-        (cx || cy) && this.add(1, 0, 0, 1, cx, cy);
-        this.add(x, 0, 0, y, 0, 0);
-        (cx || cy) && this.add(1, 0, 0, 1, -cx, -cy);
+      y == null && (y = x);
+      (cx || cy) && this.add(1, 0, 0, 1, cx, cy);
+      this.add(x, 0, 0, y, 0, 0);
+      (cx || cy) && this.add(1, 0, 0, 1, -cx, -cy);
     },
 
     rotate: function (a, x, y) {
@@ -87,8 +96,12 @@
       return x * this.b + y * this.d + this.f;
     },
 
+    xy: function (x, y) {
+      return [this.x(x, y), this.y(x, y)];
+    },
+
     get: function (i) {
-      return +this[Str.fromCharCode(97 + i)].toFixed(4);
+      return +this[String.fromCharCode(97 + i)].toFixed(4);
     },
 
     offset: function () {

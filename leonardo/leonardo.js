@@ -3,9 +3,6 @@
   // global
   var w = this
     , d = w.document
-    // valid attribute
-    // element events
-    //, events = "mouseover mouseout mousedown mouseup click".split(" ")
     // canvas events
     , cevents = "mousedown mouseup mousemove touchstart touchmove touchend click".split(" ")
     // map element events to canvas events
@@ -48,8 +45,8 @@
         mousemove: function (el, pt, curIndex, elements) {
           // drag
           if (el.flags.dragging) {
-            el.updateCoords(pt.x, pt.y);
-            el.redraw();
+            el.attr({x: pt.x - el.attrs.dx, y: pt.y - el.attrs.dy});
+            //el.redraw();
           }
           // mouseover
           else if (!el.flags.over && L.isPointInRange(el, pt)) {
@@ -93,17 +90,16 @@
         },
 
         mouseup: function (el, pt) {
-          if (L.isPointInRange(el, pt)) {
-            if (el.dragend && el.flags.dragging) {
-              el.flags.dragging = false;
-              this.flags.dragging = false;
-              el.updateCoords(pt.x - el.attrs.dx, pt.y - el.attrs.dy);
-              L.is("Function", el.dragend) && el.dragend.call(el);
-            }
-            else {
-              el.mouseup && el.mouseup.call(el);
-            }
+          //if (L.isPointInRange(el, pt)) {
+          if (el.dragend && el.flags.dragging) {
+            el.flags.dragging = false;
+            this.flags.dragging = false;
+            L.is("Function", el.dragend) && el.dragend.call(el);
           }
+          else {
+            el.mouseup && el.mouseup.call(el);
+          }
+          //}
         },
 
         click: function (el, p) {
@@ -288,6 +284,7 @@
     }
     else {
       var poly = el.coords;
+      //console.log(poly);
       for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i) {
         ((poly[i][1] <= pt.y && pt.y < poly[j][1]) || (poly[j][1] <= pt.y && pt.y < poly[i][1]))
         && (pt.x < (poly[j][0] - poly[i][0]) * (pt.y - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0])
