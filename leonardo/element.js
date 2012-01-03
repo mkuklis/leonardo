@@ -6,14 +6,10 @@
         rotate: function (t) {
           this.m.rotate(t.angle);
           this.ctx.rotate(t.angle * Math.PI / 180);
-          var a = this.attrs;
-          this.coords = [[-t.cx, -t.cy], [-t.cx + a.w, -t.cy], [-t.cx + a.w, -t.cy + a.h], [-t.cx, -t.cy + a.h]];
         },
         scale: function (t) {
           this.m.scale(t.sx, t.sy);
           this.ctx.scale(t.sx, t.sy);
-          var a = this.attrs;
-          this.coords = [[-t.cx, -t.cy], [-t.cx + a.w, -t.cy], [-t.cx + a.w, -t.cy + a.h], [-t.cx, -t.cy + a.h]];
         }
       };
 
@@ -34,7 +30,6 @@
     this.ctx = this.l.ctx;
     this.m = new L.Matrix(); // transformation matrix
     this.t = []; // tansformations
-    this.coords = [];
     var options = options || {};
 
     if (options.back) {
@@ -43,6 +38,8 @@
     else {
       this.l.elements.push(this);
     }
+
+    this.updateCoords();
 
     this.id = L.uuid();
   }
@@ -85,9 +82,9 @@
     draw: function () {
       var a = this.attrs;
 
-      if (this.t.length) {
-        this.ctx.save();
-      }
+      //if (this.t.length) {
+      this.ctx.save();
+      //}
 
       this.ctx.beginPath();
 
@@ -103,14 +100,17 @@
         this.transform();
       }
 
+      this.updateCoords();
 
       if (this.type == "circle") {
         this.ctx.arc(a.x - a.dx, a.y - a.dy, a.r, 0, Math.PI * 2, true);
       }
 
       if (this.type == "rect") {
-        this.ctx.rect(-a.cx, -a.cy, a.w, a.h);
+        //this.ctx.rect(-a.cx, -a.cy, a.w, a.h);
         //this.ctx.rect(a.x - a.dx, a.y - a.dy, a.w, a.h);
+        this.ctx.rect(a.tx, a.ty, a.w, a.h);
+
       }
 
       if (this.type == "path") {
@@ -126,11 +126,7 @@
       }
 
       this.ctx.closePath();
-
-      if (this.t.length) {
-        this.ctx.restore();
-      }
-
+      this.ctx.restore();
     },
 
     createStyle: function () {
@@ -219,12 +215,11 @@
     },
 
     toFront: function () {
-      var i = this.l.elements.indexOf(this)
-        , self = this
+      var index = this.l.elements.indexOf(this)
         , elems = this.l.elements;
 
-      if (i < elems.length - 1) {
-        elems.splice(i, 1);
+      if (index < elems.length - 1) {
+        elems.splice(index, 1);
         elems.push(this);
 
         events.forEach(function (name) {
@@ -238,7 +233,7 @@
           }
         }, this);
 
-        this.l.flags.mouseover = i;
+        this.l.flags.mouseover = index;
         this.redraw();
       }
     },
@@ -268,22 +263,11 @@
 
       a.cx = cx;
       a.cy = cy;
-
-      /*
-      if (!a.cx) {
-        if (cx && cy) {
-          a.cx = a.x + cx;
-          a.cy = a.y + cy;
-        }
-        else {
-          a.cx = a.x + a.w/2;
-          a.cy = a.y + a.h/2;
-        }
-      }
-      */
+      a.tx = -cx;
+      a.ty = -cy;
 
       this.t.push({c: 'rotate', angle: angle, cx: cx, cy: cy});
-      this.draw();
+      this.redraw();
       return this;
     },
 
@@ -294,19 +278,31 @@
       this.ctx.translate(a.x + a.cx, a.y + a.cy);
 
       this.t.forEach(function (t) {
-        // process tansformations
         transCommands[t.c].call(this, t);
       }, this);
-
-      this.updateCoords();
     },
 
     updateCoords: function () {
-      var coords = this.coords;
-      coords.forEach(function (c, i) {
-        var p =this.m.xy(c[0], c[1]);
-        this.coords[i] = p;
-      }, this);
+      var a = this.attrs;
+
+      if (this.t.length) {
+        this.coords = [[a.tx, a.ty], [a.tx + a.w, a.ty],
+          [a.tx + a.w, a.ty + a.h], [a.tx, a.ty + a.h]];
+
+        this.coords.forEach(function (c, i) {
+          this.coords[i] = this.m.xy(c[0], c[1]);
+        }, this);
+      }
+      else {
+        var x = a.x
+          , y = a.y
+          , w = a.w
+          , h = a.h;
+
+        a.tx = x;
+        a.ty = y;
+        this.coords = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
+      }
     }
   }
 
