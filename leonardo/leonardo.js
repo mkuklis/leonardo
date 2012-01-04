@@ -20,26 +20,6 @@
       }
     // touch is supported
     , supportsTouch = 'createTouch' in d
-    // path commands
-    , pathCommands = {
-        M: function (v) {
-          this.l.ctx.moveTo(v[0], v[1]);
-        },
-        L: function (v) {
-          for (var i = 0, l = v.length; i < l; i += 2) {
-            this.l.ctx.lineTo(v[i], v[i + 1]);
-          }
-        },
-        l: function (v) {
-
-        },
-        V: function (v) {
-          this.l.ctx.lineTo(0, v);
-        },
-        H: function (v) {
-          this.l.ctx.lineTo(v, 0);
-        }
-      }
     // canvas event handlers
     , handlers = {
         mousemove: function (el, pt, curIndex, elements) {
@@ -284,7 +264,6 @@
     }
     else {
       var poly = el.coords;
-      //console.log(poly);
       for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i) {
         ((poly[i][1] <= pt.y && pt.y < poly[j][1]) || (poly[j][1] <= pt.y && pt.y < poly[i][1]))
         && (pt.x < (poly[j][0] - poly[i][0]) * (pt.y - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0])

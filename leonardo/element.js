@@ -1,8 +1,36 @@
 (function (L) {
 
-  var events = "mouseover mouseout mousedown mouseup click".split(" "),
-      // transformation commands executed in the context of element
-      transCommands = {
+  var events = "mouseover mouseout mousedown mouseup click".split(" ")
+    // path commands
+    , pathCommands = {
+        M: function (v) {
+          this.ctx.moveTo(v[0], v[1]);
+        },
+        L: function (v) {
+          for (var i = 0, l = v.length; i < l; i += 2) {
+            this.ctx.lineTo(v[i], v[i + 1]);
+          }
+        },
+        l: function (v) {
+
+        },
+        // vertical line
+        V: function (v) {
+          this.ctx.lineTo(0, v);
+        },
+        // horizontal line
+        H: function (v) {
+          this.ctx.lineTo(v, 0);
+        },
+        // quadratric curves
+        Q: function (v) {
+          for (var i = 0, l = v.length; i < l; i += 4) {
+            this.ctx.quadraticCurveTo(v[i], v[i + 1], v[i + 2], v[i + 3]);
+          }
+        }
+      }
+    // transformation commands executed in the context of element
+    , transCommands = {
         rotate: function (t) {
           this.m.rotate(t.angle);
           this.ctx.rotate(t.angle * Math.PI / 180);
@@ -40,7 +68,6 @@
     }
 
     this.updateCoords();
-
     this.id = L.uuid();
   }
 
@@ -107,10 +134,7 @@
       }
 
       if (this.type == "rect") {
-        //this.ctx.rect(-a.cx, -a.cy, a.w, a.h);
-        //this.ctx.rect(a.x - a.dx, a.y - a.dy, a.w, a.h);
         this.ctx.rect(a.tx, a.ty, a.w, a.h);
-
       }
 
       if (this.type == "path") {
