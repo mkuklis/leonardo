@@ -27,6 +27,12 @@
           for (var i = 0, l = v.length; i < l; i += 4) {
             this.ctx.quadraticCurveTo(v[i], v[i + 1], v[i + 2], v[i + 3]);
           }
+        },
+        // bezier curves
+        B: function (v) {
+          for (var i = 0, l = v.length; i < l; i += 6) {
+            this.ctx.bezierCurveTo(v[i], v[i + 1], v[i + 2], v[i + 3], v[i + 4], v[i + 5]);
+          }
         }
       }
     // transformation commands executed in the context of element
@@ -109,10 +115,7 @@
     draw: function () {
       var a = this.attrs;
 
-      //if (this.t.length) {
       this.ctx.save();
-      //}
-
       this.ctx.beginPath();
 
       if (a.fill) {
