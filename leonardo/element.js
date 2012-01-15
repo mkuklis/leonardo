@@ -144,6 +144,10 @@
         this.attrs.path.forEach(this.processPath, this);
       }
 
+      if (this.type == "image") {
+        this.processImage();
+      }
+
       this.ctx.stroke();
       this.ctx.fill();
 
@@ -182,6 +186,22 @@
       this.ctx.fillStyle = color;
       this.ctx.font = font;
       this.ctx.fillText(attrs.text, attrs.x - attrs.dx, attrs.y - attrs.dy);
+    },
+
+    processImage: function () {
+      var attrs = this.attrs;
+
+      if (!this.img) {
+        this.img = new Image();
+        this.img.onload = L.proxy(function () {
+          this.ctx.drawImage(this.img, attrs.x, attrs.y, attrs.w, attrs.h);
+        }, this);
+
+        this.img.src = attrs.src;
+      }
+      else {
+        this.ctx.drawImage(this.img, attrs.x, attrs.y, attrs.w, attrs.h);
+      }
     },
 
     parseGradient: function (str) {

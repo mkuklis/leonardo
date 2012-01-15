@@ -137,7 +137,6 @@
       var pos = {x: x || 0, y: y || 0, w: w || 0, h: h || 0, r: r || 0}
         , rect = L.E('rect', L.extend(pos, attrs), this);
       rect.draw();
-
       return rect;
     },
 
@@ -154,6 +153,15 @@
       }
 
       return path;
+    },
+
+    // create image element
+    image: function (src, x, y, w, h, attrs) {
+      var pos = {src: src, x: x || 0, y: y || 0, w: w || 0, h: h || 0}
+        , image = L.E('image', L.extend(pos, attrs), this);
+      image.draw();
+
+      return image;
     },
 
     // redraws all elements
