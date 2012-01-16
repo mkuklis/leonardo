@@ -53,6 +53,7 @@
     , drawCommmands = {
         circle: function (a) {
           this.ctx.arc(a.x - a.dx, a.y - a.dy, a.r, 0, Math.PI * 2, true);
+          this.updateBbox({x: a.x - a.dx - a.r, y: a.y - a.dy - a.r, w: 2 * a.r, h: 2 * a.r});
         },
         rect: function (a) {
           this.ctx.rect(a.tx, a.ty, a.w, a.h);
@@ -61,8 +62,9 @@
         path: function () {
           this.attrs.path.forEach(this.processPath, this);
         },
-        image: function () {
+        image: function (a) {
           this.processImage();
+          this.updateBbox({x: a.x, y: a.y, w: a.w, h: a.h});
         }
       };
 
