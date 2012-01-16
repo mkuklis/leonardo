@@ -34,6 +34,7 @@
         B: function (v) {
           for (var i = 0, l = v.length; i < l; i += 6) {
             this.ctx.bezierCurveTo(v[i], v[i + 1], v[i + 2], v[i + 3], v[i + 4], v[i + 5]);
+            this.updateBbox({x: v[i + 4], y: v[i + 5]});
           }
         }
       }
