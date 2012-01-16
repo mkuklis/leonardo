@@ -56,6 +56,7 @@
         },
         rect: function (a) {
           this.ctx.rect(a.tx, a.ty, a.w, a.h);
+          this.updateBbox({x: a.tx, y: a.ty, w: a.w, h: a.h});
         },
         path: function () {
           this.attrs.path.forEach(this.processPath, this);
@@ -81,7 +82,7 @@
     this.ctx = this.l.ctx;
     this.m = new L.Matrix(); // transformation matrix
     this.t = []; // tansformations
-    this.bbox = {x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity, w: 0, h: 0}; // bbox
+    this.bbox = {x: Infinity, y: Infinity, w: 0, h: 0}; // bbox
     var options = options || {};
 
     if (options.back) {
@@ -154,7 +155,7 @@
       }
 
       this.ctx.strokeStyle = "#ff0000";
-      this.ctx.rect(this.bbox.x1, this.bbox.y1, this.bbox.w, this.bbox.h);
+      this.ctx.rect(this.bbox.x, this.bbox.y, this.bbox.w, this.bbox.h);
 
       this.ctx.stroke();
 
@@ -166,7 +167,6 @@
       if (a.text) {
         this.processText();
       }
-
 
       this.ctx.closePath();
       this.ctx.restore();
@@ -361,13 +361,15 @@
 
     updateBbox: function (a) {
       var b = this.bbox;
-      if (a.x && a.y) {
-        if (a.x < b.x1) b.x1 = a.x;
-        if (a.x > b.x2) b.x2 = a.x;
-        if (a.y < b.y1) b.y1 = a.y;
-        if (a.y > b.y2) b.y2 = a.y;
-        b.w = b.x2 - b.x1;
-        b.h = b.y2 - b.y1;
+
+      if (a.w && a.h) {
+        this.bbox = a;
+      }
+      else if (a.x && a.y) {
+        if (a.x < b.x) b.x = a.x;
+        if (a.x > b.x + b.w) b.w = a.x - b.x;
+        if (a.y < b.y) b.y = a.y;
+        if (a.y > b.y + b.h) b.h = a.y - b.y;
       }
     },
 
