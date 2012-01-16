@@ -1,18 +1,19 @@
 (function (L) {
 
   var events = "mouseover mouseout mousedown mouseup click".split(" ")
-    // path commands
+      // path commands
     , pathCommands = {
+        // move
         M: function (v) {
           this.ctx.moveTo(v[0], v[1]);
+          this.updateBbox({x: v[0], y: v[1]});
         },
+        // line
         L: function (v) {
           for (var i = 0, l = v.length; i < l; i += 2) {
             this.ctx.lineTo(v[i], v[i + 1]);
+            this.updateBbox({x: v[i], y: v[i + 1]});
           }
-        },
-        l: function (v) {
-
         },
         // vertical line
         V: function (v) {
@@ -26,6 +27,7 @@
         Q: function (v) {
           for (var i = 0, l = v.length; i < l; i += 4) {
             this.ctx.quadraticCurveTo(v[i], v[i + 1], v[i + 2], v[i + 3]);
+            this.updateBbox({x: v[i + 2], y: v[i + 3]});
           }
         },
         // bezier curves
@@ -35,7 +37,7 @@
           }
         }
       }
-    // transformation commands executed in the context of element
+      // transformation commands executed in the context of the element
     , transCommands = {
         rotate: function (t) {
           this.m.rotate(t.angle);
@@ -45,8 +47,22 @@
           this.m.scale(t.sx, t.sy);
           this.ctx.scale(t.sx, t.sy);
         }
+      }
+    // draw commands which executed in the context of the element
+    , drawCommmands = {
+        circle: function (a) {
+          this.ctx.arc(a.x - a.dx, a.y - a.dy, a.r, 0, Math.PI * 2, true);
+        },
+        rect: function (a) {
+          this.ctx.rect(a.tx, a.ty, a.w, a.h);
+        },
+        path: function () {
+          this.attrs.path.forEach(this.processPath, this);
+        },
+        image: function () {
+          this.processImage();
+        }
       };
-
 
   // element constructor
   var E = function (type, attrs, leonardo, options) {
@@ -64,6 +80,7 @@
     this.ctx = this.l.ctx;
     this.m = new L.Matrix(); // transformation matrix
     this.t = []; // tansformations
+    this.bbox = {x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity, w: 0, h: 0}; // bbox
     var options = options || {};
 
     if (options.back) {
@@ -131,30 +148,24 @@
       }
 
       this.updateCoords();
-
-      if (this.type == "circle") {
-        this.ctx.arc(a.x - a.dx, a.y - a.dy, a.r, 0, Math.PI * 2, true);
+      if (drawCommmands[this.type]) {
+        drawCommmands[this.type].call(this, a);
       }
 
-      if (this.type == "rect") {
-        this.ctx.rect(a.tx, a.ty, a.w, a.h);
-      }
-
-      if (this.type == "path") {
-        this.attrs.path.forEach(this.processPath, this);
-      }
-
-      if (this.type == "image") {
-        this.processImage();
-      }
+      this.ctx.strokeStyle = "#ff0000";
+      this.ctx.rect(this.bbox.x1, this.bbox.y1, this.bbox.w, this.bbox.h);
 
       this.ctx.stroke();
-      this.ctx.fill();
+
+      if (a.fill) {
+        this.ctx.fill();
+      }
 
       // text
       if (a.text) {
         this.processText();
       }
+
 
       this.ctx.closePath();
       this.ctx.restore();
@@ -347,9 +358,25 @@
       }, this);
     },
 
+    updateBbox: function (a) {
+      var b = this.bbox;
+      if (a.x && a.y) {
+        if (a.x < b.x1) b.x1 = a.x;
+        if (a.x > b.x2) b.x2 = a.x;
+        if (a.y < b.y1) b.y1 = a.y;
+        if (a.y > b.y2) b.y2 = a.y;
+        b.w = b.x2 - b.x1;
+        b.h = b.y2 - b.y1;
+      }
+    },
+
+    getBbox: function () {
+      return this.bbox;
+    },
+
     updateCoords: function () {
       var a = this.attrs;
-
+      // transformation present
       if (this.t.length) {
         this.coords = [[a.tx, a.ty], [a.tx + a.w, a.ty],
           [a.tx + a.w, a.ty + a.h], [a.tx, a.ty + a.h]];
