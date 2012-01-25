@@ -1,10 +1,10 @@
 <html>
   <head></head>
   <body>
-    <script src="leonardo/leonardo.js"></script>
-    <script src="leonardo/color.js"></script>
-    <script src="leonardo/element.js"></script>
-    <script src="leonardo/matrix.js"></script>
+    <script src="src/leonardo.js"></script>
+    <script src="src/color.js"></script>
+    <script src="src/element.js"></script>
+    <script src="src/matrix.js"></script>
     <script>
 
       var paper = Leonardo(0, 0, 500, 500);
@@ -19,6 +19,8 @@
       //var rect1 = paper.rect(50, 50, 50, 50).attr({fill: '#ff0000'}).drag().rotate(45).scale(1.75, 1.75);
       //var rect2 = paper.circle(150, 150, 100).drag();
       var img = paper.image('img/mkuklis.png', 100, 100, 100, 100).drag();
+
+      var circle2 = paper.circle(100, 100, 100);
 
       /*
       paper.path([

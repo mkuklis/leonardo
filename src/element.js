@@ -17,11 +17,11 @@
         },
         // vertical line
         V: function (v) {
-          this.ctx.lineTo(0, v);
+          this.ctx.lineTo(this.bbox.x, v);
         },
         // horizontal line
         H: function (v) {
-          this.ctx.lineTo(v, 0);
+          this.ctx.lineTo(v, this.bbox.y);
         },
         // quadratric curves
         Q: function (v) {

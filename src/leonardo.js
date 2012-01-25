@@ -172,6 +172,7 @@
       });
     },
 
+    // clears paper, removes all elements
     reset: function () {
       var events = this.events;
 
