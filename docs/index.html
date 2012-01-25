@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css" media="screen">
+  </head>
+  <body>
+    <div class="left">
+      <div class="api">
+        <p>Leonardo.js (0.1)</p>
+      </div>
+    </div>
+    <div class="right">
+      <div style="height: 3000px;">
+        <canvas id="canvas" width="800px" height="800px"></canvas>
+      </div>
+    </div>
+    <script src="../dist/leonardo.min.js"></script>
+    <script>
+      var paper = Leonardo("canvas");
+      var circle1 = paper.circle(75, 100, 50);
+      circle1.attr({fill: "#ff0000", stroke: "#ff0000", opacity: 0.3});
+      var circle2 = paper.circle(150, 100, 50);
+      circle2.attr({fill: "#00ff00", stroke: "#00ff00", opacity: 0.3});
+      var circle3 = paper.circle(125, 150, 50);
+      circle3.attr({fill: "#0000ff", stroke: "#0000ff", opacity: 0.3});
+    </script>
+  </body>
+</html>

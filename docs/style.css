@@ -1,0 +1,27 @@
+html, body {
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  font-family: Helvetica Neue, Helvetica, Arial;
+}
+
+.left, .right {
+  height: 100%;
+  overflow: auto;
+  float: left;
+}
+
+.left {
+  width: 20%;
+}
+
+.right {
+  width: 80%;
+}
+
+.left .api {
+  min-height: 1000px;
+  border-right: 2px solid #eee;
+  padding: 5px 10px 10px 10px;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
+}

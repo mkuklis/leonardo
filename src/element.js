@@ -156,11 +156,6 @@
         drawCommmands[this.type].call(this, a);
       }
 
-      this.ctx.strokeStyle = "#ff0000";
-      this.ctx.rect(this.bbox.x, this.bbox.y, this.bbox.w, this.bbox.h);
-
-      this.ctx.stroke();
-
       if (a.fill) {
         this.ctx.fill();
       }
