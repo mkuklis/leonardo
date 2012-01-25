@@ -38,10 +38,28 @@ describe("Leonardo", function () {
     expect(line.attrs.path).toEqual(path);
   });
 
-  it("can draw horizontal line", function () {
-    var path = [{M: [20, 20], H: 200}];
+  it("can draw quadratic curve", function () {
+    var path = [{M:[75, 25]},
+        {Q:[25,25,25,62.5, 25,100,50,100, 50,120,30,125, 60,120,65,100, 125,100,125,62.5, 125,25,75,25]}];
     var line = paper.path(path);
     expect(line.attrs.path).toEqual(path);
+  });
+
+  it("can draw bezier curve", function () {
+   var path = [
+        {M:[75, 40]},
+        {B:[75,37,70,25,50,25, 20,25,20,62.5,20,62.5,
+            20,80,40,102,75,120, 110,102,130,80,130,62.5,
+            130,62.5,130,25,100,25, 85,25,75,37,75,40]}];
+
+    var line = paper.path(path);
+    expect(line.attrs.path).toEqual(path);
+  });
+
+  it("can render image", function () {
+    var assets = 'assets/img.jpg';
+    var image = paper.image(assets, 100, 300, 100, 100);
+    expect(image.attrs.src).toEqual(assets);
   });
 
 });
