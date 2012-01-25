@@ -1,8 +1,13 @@
+@font-face{
+  font-family:'Museo Sans 500';
+  src: url('./MuseoSans_500.otf'); /* everyone else take this */
+}
+
 html, body {
   height: 100%;
   padding: 0px;
   margin: 0px;
-  font-family: Helvetica Neue, Helvetica, Arial;
+  font-family: 'Museo Sans 500';
 }
 
 .left, .right {
@@ -23,5 +28,4 @@ html, body {
   min-height: 1000px;
   border-right: 2px solid #eee;
   padding: 5px 10px 10px 10px;
-  font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
 }
