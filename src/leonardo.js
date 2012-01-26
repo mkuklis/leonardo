@@ -234,6 +234,20 @@
           e.splice(i, 1);
         }
       });
+    },
+    // returns pixel for given position
+    // useful for testing
+    getPx: function (x, y) {
+      return this.ctx.getImageData(x, y, 1, 1).data;
+    },
+
+    getPxColor: function (x, y) {
+      var px = this.getPx(x, y);
+      if (px[0] == 0 && px[1] == 0 && px[2] == 0) {
+        return (px[3] == 0) ? "#ffffff" : "#000000";
+      }
+
+      return "#" + L.C.rgbToHex(px[0], px[1], px[2]);
     }
   };
 

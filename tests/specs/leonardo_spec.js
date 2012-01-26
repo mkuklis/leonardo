@@ -11,6 +11,7 @@ describe("Leonardo", function () {
     expect(rect.attrs.y).toEqual(250);
     expect(rect.attrs.w).toEqual(100);
     expect(rect.attrs.h).toEqual(100);
+    expect(paper.getPxColor(250, 250)).toBe("#000000");
   });
 
   it("can draw circle", function () {
