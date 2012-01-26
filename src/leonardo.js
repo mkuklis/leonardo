@@ -115,6 +115,8 @@
 
   L.version = 0.1;
 
+  L.debug = false;
+
   function Leo() {
     this.elements = [];
     this.events = {};

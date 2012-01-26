@@ -52,9 +52,8 @@
     // draw commands which executed in the context of the element
     , drawCommmands = {
         circle: function (a) {
-          //this.ctx.arc(a.x - a.dx, a.y - a.dy, a.r, 0, Math.PI * 2, true);
           this.ctx.arc(a.tx, a.ty, a.r, 0, Math.PI * 2, true);
-          this.updateBbox({x: a.x - a.dx - a.r, y: a.y - a.dy - a.r, w: 2 * a.r, h: 2 * a.r});
+          this.updateBbox({x: a.tx - a.r, y: a.ty - a.r, w: 2 * a.r, h: 2 * a.r});
         },
         rect: function (a) {
           this.ctx.rect(a.tx, a.ty, a.w, a.h);
@@ -164,6 +163,13 @@
       // text
       if (a.text) {
         this.processText();
+      }
+
+      this.ctx.stroke();
+
+      if (L.debug) {
+        this.ctx.rect(this.bbox.x, this.bbox.y, this.bbox.w, this.bbox.h);
+        this.ctx.stroke();
       }
 
       this.ctx.closePath();
