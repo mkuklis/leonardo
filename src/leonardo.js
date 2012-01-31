@@ -6,7 +6,7 @@
     // canvas events
     , cevents = "mousedown mouseup mousemove touchstart touchmove touchend click".split(" ")
     // map element events to canvas events
-    , map = {
+    , emap = {
         "mouseover": "mousemove",
         "mouseout": "mousemove",
         /*
@@ -200,7 +200,7 @@
       var x, y;
       if (e.touches) {
         x = e.touches[0].pageX - this.canvas.offsetLeft;
-        y = e.touches[0].pageY - this.canvas.offsetLeft;
+        y = e.touches[0].pageY - this.canvas.offsetTop;
       }
       else {
         x = e.pageX - this.canvas.offsetLeft;
@@ -208,26 +208,27 @@
       }
 
       return {x: x, y: y};
+      return pos;
     },
 
-    bind: function (n, el) {
-      var e = this.events
-        , n = (map[n]) ? map[n] : n;
+    on: function (n, el) {
+      var evts = this.events
+        , n = (emap[n]) ? emap[n] : n;
 
-      if (!this.events[n]) {
-        this.events[n] = [];
+      if (!evts[n]) {
+        evts[n] = [];
         this.canvas.addEventListener(n, L.proxy(function (e) {
           this[n](e);
           e.preventDefault();
         }, this), false);
       }
 
-      if (e[n].length == 0 || e[n].indexOf(el) == -1) {
-        e[n].push(el);
+      if (evts[n].length == 0 || evts[n].indexOf(el) == -1) {
+        evts[n].push(el);
       }
     },
 
-    unbind: function (n, el) {
+    off: function (n, el) {
       var e = this.events[n];
       e.forEach(function (ell, i) {
         if (ell == el) {

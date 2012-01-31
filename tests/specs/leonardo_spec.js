@@ -89,4 +89,47 @@ describe("Leonardo", function () {
       expect(paper.events.mousedown.length).toBe(0);
     });
   });
+
+  describe("#getPos", function () {
+    it("returns position", function () {
+      sinon.spy(paper, "getPos");
+      var circle = paper.circle(300, 300, 50).click();
+      var e = simulate(paper.canvas, 'click', {pointerX: 200, pointerY: 200});
+      expect(paper.getPos).toHaveBeenCalledWith(e);
+      expect(paper.getPos.returnValues[0]).toEqual({x:0, y: 0});
+      paper.getPos.restore();
+    });
+  });
+
+  describe("#on", function () {
+    beforeEach(function () {
+      paper.reset();
+      sinon.spy(paper, "on");
+    });
+
+    afterEach(function () {
+      paper.on.restore();
+    });
+
+    it ("adds click event", function () {
+      var circle = paper.circle(300, 300, 50).click();
+      expect(paper.on).toHaveBeenCalledWith('click', circle);
+      expect(paper.events.click.length).toBe(1);
+      expect(paper.events.click[0]).toBe(circle);
+
+      var circle = paper.circle(200, 200, 50).click();
+      expect(paper.events.click.length).toBe(2);
+    });
+
+    it ("adds dragstart, dragmove, dragend events", function () {
+      var circle = paper.circle(300, 300, 50).drag();
+      expect(paper.on).toHaveBeenCalledWith('dragstart', circle);
+      expect(paper.on).toHaveBeenCalledWith('dragmove', circle);
+      expect(paper.on).toHaveBeenCalledWith('dragend', circle);
+
+      expect(paper.events.mousedown.length).toBe(1);
+      expect(paper.events.mousemove.length).toBe(1);
+      expect(paper.events.mouseup.length).toBe(1);
+    });
+  });
 });

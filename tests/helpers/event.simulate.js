@@ -60,7 +60,7 @@ var simulate = (function () {
       element.fireEvent('on' + eventName, oEvent);
     }
 
-    return element;
+    return oEvent;
   }
 
 })();

@@ -252,28 +252,28 @@
     },
 
     drag: function (start, move, end) {
-      this.bind("dragstart", start || true);
-      this.bind("dragmove", move || true);
-      this.bind("dragend", end || true);
+      this.on("dragstart", start || true);
+      this.on("dragmove", move || true);
+      this.on("dragend", end || true);
       return this;
     },
 
     touch: function (start, move, end) {
-      this.bind("touchstart", start || true);
-      this.bind("touchmove", move || true);
-      this.bind("touchend", end || true);
+      this.on("touchstart", start || true);
+      this.on("touchmove", move || true);
+      this.on("touchend", end || true);
       return this;
     },
 
-    bind: function (name, callback) {
+    on: function (name, callback) {
       this[name] = callback;
-      this.l.bind(name, this);
+      this.l.on(name, this);
       return this;
     },
 
-    unbind: function (name, callback) {
+    off: function (name, callback) {
       this[name] = callback;
-      this.l.unbind(name, this);
+      this.l.off(name, this);
       return this;
     },
 
@@ -415,12 +415,12 @@
   for (var i = 0, l = events.length; i < l; i++) {
     (function (n) {
       E.prototype[n] = function (c) {
-        this.bind(n, c);
+        this.on(n, c);
         return this;
       }
 
       E.prototype["un" + n] = function (c) {
-        this.unbind(n, c);
+        this.off(n, c);
         return this;
       }
     })(events[i]);
