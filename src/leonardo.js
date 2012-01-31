@@ -123,6 +123,7 @@
     this.flags = {};
   }
 
+  // leonardo API
   Leo.prototype = {
     // create circle element
     circle: function (x, y, r, attrs) {
@@ -189,7 +190,7 @@
       this.clear();
     },
 
-    // clears paper, removes all elements
+    // clears paper keeps all elements in memory
     clear: function () {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.beginPath();

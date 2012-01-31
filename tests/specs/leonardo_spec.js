@@ -2,65 +2,91 @@ describe("Leonardo", function () {
   var paper = Leonardo(200, 200, 1000, 1000);
 
   beforeEach(function () {
-    //paper.clear();
+    this.addMatchers(LeonardoMatchers);
   });
 
-  it("can draw rectangle", function () {
-    var rect = paper.rect(250, 250, 100, 100);
-    expect(rect.attrs.x).toEqual(250);
-    expect(rect.attrs.y).toEqual(250);
-    expect(rect.attrs.w).toEqual(100);
-    expect(rect.attrs.h).toEqual(100);
-    expect(paper.getPxColor(250, 250)).toBe("#000000");
+  describe("#rectangle", function () {
+    it("can draw rectangle", function () {
+      var r = {x: 250, y: 250, w: 250, h: 250};
+      var rect = paper.rect(r.x, r.y, r.w, r.h);
+      expect(rect).toBeRectangle(r);
+    });
   });
 
-  it("can draw circle", function () {
-    var circle = paper.circle(100, 100, 100);
-    expect(circle.attrs.x).toEqual(100);
-    expect(circle.attrs.y).toEqual(100);
-    expect(circle.attrs.r).toEqual(100);
+  describe("#circle", function () {
+    it("can draw circle", function () {
+      var c = {x: 100, y: 100, r: 100};
+      var circle = paper.circle(c.x, c.y, c.r);
+      expect(circle).toBeCircle(c);
+    });
   });
 
-  it("can draw line", function () {
-    var path = [{M: [200, 0], L: [300, 250]}];
-    var line = paper.path(path);
-    expect(line.attrs.path).toEqual(path);
+  describe("#path", function () {
+    it("can draw line", function () {
+      var path = [{M: [200, 0], L: [300, 250]}];
+      var line = paper.path(path);
+      expect(line.attrs.path).toEqual(path);
+    });
+
+    it("can draw vertical line", function () {
+      var path = [{M: [20, 20], V: 200}];
+      var line = paper.path(path);
+      expect(line.attrs.path).toEqual(path);
+    });
+
+    it("can draw horizontal line", function () {
+      var path = [{M: [20, 20], H: 200}];
+      var line = paper.path(path);
+      expect(line.attrs.path).toEqual(path);
+    });
+
+    it("can draw quadratic curve", function () {
+      var path = [{M:[75, 25]},
+          {Q:[25,25,25,62.5, 25,100,50,100, 50,120,30,125, 60,120,65,100, 125,100,125,62.5, 125,25,75,25]}];
+      var line = paper.path(path);
+      expect(line.attrs.path).toEqual(path);
+    });
+
+    it("can draw bezier curve", function () {
+      var path = [
+          {M:[75, 40]},
+          {B:[75,37,70,25,50,25, 20,25,20,62.5,20,62.5,
+              20,80,40,102,75,120, 110,102,130,80,130,62.5,
+              130,62.5,130,25,100,25, 85,25,75,37,75,40]}];
+
+      var line = paper.path(path);
+      expect(line.attrs.path).toEqual(path);
+    });
   });
 
-  it("can draw vertical line", function () {
-    var path = [{M: [20, 20], V: 200}];
-    var line = paper.path(path);
-    expect(line.attrs.path).toEqual(path);
+  describe("#image", function () {
+    it("can render image", function () {
+      var assets = 'assets/img.jpg';
+      var image = paper.image(assets, 100, 300, 100, 100);
+      expect(image.attrs.src).toEqual(assets);
+    });
   });
 
-  it("can draw horizontal line", function () {
-    var path = [{M: [20, 20], H: 200}];
-    var line = paper.path(path);
-    expect(line.attrs.path).toEqual(path);
+  describe("#clear", function () {
+    it("can clear paper", function () {
+      var c = {x: 50, y: 50, r: 10};
+      var circle = paper.circle(c.x, c.y, c.r);
+      var size = paper.elements.length;
+      expect(paper.getPxColor(c.x + c.r, c.y)).toBe("#000000");
+      paper.clear();
+      expect(paper.elements.length).toBe(size);
+      expect(paper.getPxColor(c.x + c.r, c.y)).toBe("#ffffff");
+    });
   });
 
-  it("can draw quadratic curve", function () {
-    var path = [{M:[75, 25]},
-        {Q:[25,25,25,62.5, 25,100,50,100, 50,120,30,125, 60,120,65,100, 125,100,125,62.5, 125,25,75,25]}];
-    var line = paper.path(path);
-    expect(line.attrs.path).toEqual(path);
+  describe("#reset", function () {
+    it("can reset paper", function () {
+      paper.circle(c.x, c.y, c.r).drag();
+      expect(paper.events.mousedown.length).not.toBe(0);
+      expect(paper.elements.length).not.toBe(0);
+      paper.reset();
+      expect(paper.elements.length).toBe(0);
+      expect(paper.events.mousedown.length).toBe(0);
+    });
   });
-
-  it("can draw bezier curve", function () {
-   var path = [
-        {M:[75, 40]},
-        {B:[75,37,70,25,50,25, 20,25,20,62.5,20,62.5,
-            20,80,40,102,75,120, 110,102,130,80,130,62.5,
-            130,62.5,130,25,100,25, 85,25,75,37,75,40]}];
-
-    var line = paper.path(path);
-    expect(line.attrs.path).toEqual(path);
-  });
-
-  it("can render image", function () {
-    var assets = 'assets/img.jpg';
-    var image = paper.image(assets, 100, 300, 100, 100);
-    expect(image.attrs.src).toEqual(assets);
-  });
-
 });
