@@ -131,5 +131,29 @@ describe("Leonardo", function () {
       expect(paper.events.mousemove.length).toBe(1);
       expect(paper.events.mouseup.length).toBe(1);
     });
+
+    it ("adds mousemove for mouseover event", function () {
+      var circle = paper.circle(300, 300, 50).mouseover();
+      expect(paper.on).toHaveBeenCalledWith('mouseover', circle);
+      expect(paper.events.mousemove.length).toBe(1);
+    });
+
+    it ("adds mousemove for mouseout event", function () {
+      var circle = paper.circle(300, 300, 50).mouseout();
+      expect(paper.on).toHaveBeenCalledWith('mouseout', circle);
+      expect(paper.events.mousemove.length).toBe(1);
+    });
+
+    it ("adds mousedown for mousedown event", function () {
+      var circle = paper.circle(300, 300, 50).mousedown();
+      expect(paper.on).toHaveBeenCalledWith('mousedown', circle);
+      expect(paper.events.mousedown.length).toBe(1);
+    });
+
+    it ("adds mouseup event", function () {
+      var circle = paper.circle(300, 300, 50).mouseup();
+      expect(paper.on).toHaveBeenCalledWith('mouseup', circle);
+      expect(paper.events.mouseup.length).toBe(1);
+    });
   });
 });
