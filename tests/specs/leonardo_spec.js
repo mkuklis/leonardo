@@ -156,4 +156,16 @@ describe("Leonardo", function () {
       expect(paper.events.mouseup.length).toBe(1);
     });
   });
+
+  describe("#off", function () {
+    beforeEach(function () {
+      paper.reset();
+      sinon.spy(paper, "off");
+    });
+
+    afterEach(function () {
+      paper.off.restore();
+    });
+
+  });
 });
