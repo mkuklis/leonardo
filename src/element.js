@@ -1,8 +1,6 @@
 (function (L) {
-
-  var events = "mouseover mouseout mousedown mouseup click".split(" ")
-      // path commands
-    , pathCommands = {
+  // path commands
+  var pathCommands = {
         // move
         M: function (v) {
           this.ctx.moveTo(v[0], v[1]);
@@ -38,7 +36,7 @@
           }
         }
       }
-      // transformation commands executed in the context of the element
+      // transformation commands execute in the context of the element
     , transCommands = {
         rotate: function (t) {
           this.m.rotate(t.angle);
@@ -49,7 +47,7 @@
           this.ctx.scale(t.sx, t.sy);
         }
       }
-    // draw commands which executed in the context of the element
+    // draw commands which execute in the context of the element
     , drawCommmands = {
         circle: function (a) {
           this.ctx.arc(a.tx, a.ty, a.r, 0, Math.PI * 2, true);
@@ -284,7 +282,7 @@
       if (index < elems.length - 1) {
         elems.splice(index, 1);
         elems.push(this);
-
+        /*
         events.forEach(function (name) {
           var e = this.l.events[name];
           if (e) {
@@ -295,7 +293,7 @@
             }
           }
         }, this);
-
+        */
         this.l.flags.mouseover = index;
         this.redraw();
       }
@@ -411,18 +409,4 @@
 
   L.E = E;
 
-  // setup element events api
-  for (var i = 0, l = events.length; i < l; i++) {
-    (function (n) {
-      E.prototype[n] = function (c) {
-        this.on(n, c);
-        return this;
-      }
-
-      E.prototype["un" + n] = function (c) {
-        this.off(n, c);
-        return this;
-      }
-    })(events[i]);
-  }
 })(Leonardo);
