@@ -1,0 +1,41 @@
+<html>
+  <head></head>
+  <body>
+      <canvas width="400" height="400" id="canvas"></canvas>
+  </body>
+  <script src="src/leonardo.js"></script>
+  <script src="src/matrix.js"></script>
+  <script src="src/color.js"></script>
+  <script src="src/element.js"></script>
+  <script src="src/event.js"></script>
+  <script>
+    var leo = new Leonardo(0, 0, 500, 500);
+
+    var rec1 = leo.rect(10, 10, 100, 100);
+    var rec2 = leo.rect(115, 115, 100, 100);
+    var rec3 = leo.rect(80, 80, 100, 100);
+
+    rec1.attr({fill: "#ff0000"});
+    rec2.attr({fill: "#00ff00"});
+    rec3.attr({fill: "#0000ff"});
+
+    rec1.drag(function () {
+      console.log('start');
+    },
+    function () {
+      console.log('dragging..');
+    },
+    function () {
+      console.log('end');
+    });
+
+    rec2.drag(function () {
+      console.log('click 2 rec2');
+    });
+
+    rec3.drag(function () {
+      console.log('click 3 rec3');
+    });
+
+  </script>
+</html>

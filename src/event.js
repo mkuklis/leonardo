@@ -33,7 +33,7 @@
         if (!prevIndex || curIndex > prevIndex || this.l.flags.dragging) {
           if (curIndex > prevIndex) {
             var el = this.l.elements[prevIndex];
-            el.execCallback('mouseout');
+            el.execCallbacks('mouseout');
             el.flags.over = false;
           }
 
