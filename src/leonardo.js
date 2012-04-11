@@ -4,33 +4,39 @@
   var w = this
     , d = w.document;
 
-
-  this.Leonardo = this.L = function () {
-    var leo = new Leo();
-    leo.canvas = L.createCanvas.apply(leo, arguments);
-    leo.ctx = leo.canvas.getContext("2d");
-    return leo;
+  this.Leonardo = function () {
+    this.canvas = L.createCanvas.apply(this, arguments);
+    this.ctx = this.canvas.getContext("2d");
+    this.elements = [];
+    L.init.call(this);
   }
 
+  var L = Leonardo;
   L.version = 0.1;
   L.debug = false;
 
-  // leonardo constructor
-  function Leo() {
-    //this.events = {};
-    this.elements = [];
-    this.flags = {};
+  L.init = function (fn) {
+    if (fn) { // called from plugin ..
+      this.inits = this.inits || [];
+      this.inits.push(fn);
+    }
+    else { // called from constructor
+      var ctr = this.constructor;
+      ctr.inits && ctr.inits.forEach(function (fnc) {
+        fnc.call(this);
+      }, this);
+    }
   }
 
   // leonardo API
-  Leo.prototype = {
+  L.fn = {
+    constructor: L,
     // create circle element
     circle: function (x, y, r, attrs) {
-      var pos = {x: x || 0, y: y || 0, r: r || 0}
+      var pos = { x: x || 0, y: y || 0, r: r || 0 }
         , circle = L.E('circle', L.extend(pos, attrs), this);
 
       circle.draw();
-
       return circle;
     },
 
@@ -112,6 +118,8 @@
     }
   };
 
+  L.prototype = L.fn;
+
   // static functions
 
   L.toString = function () {
@@ -143,22 +151,6 @@
     }
 
     return c;
-  }
-
-  L.isPointInRange = function (el, pt) {
-    if (el.type == "circle") {
-      var d = Math.pow(el.attrs.x - pt.x, 2) + Math.pow(el.attrs.y - pt.y, 2);
-      return d <= el.attrs.r * el.attrs.r;
-    }
-    else {
-      var poly = el.coords;
-      for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i) {
-        ((poly[i][1] <= pt.y && pt.y < poly[j][1]) || (poly[j][1] <= pt.y && pt.y < poly[i][1]))
-        && (pt.x < (poly[j][0] - poly[i][0]) * (pt.y - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0])
-        && (c = !c);
-      }
-      return c;
-    }
   }
 
   L.extend = function(obj) {

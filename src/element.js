@@ -77,7 +77,6 @@
     this.attrs = attrs;
     this.attrs.dx = 0;
     this.attrs.dy = 0;
-    this.flags = {}; // event related flags
     this.l = leonardo;
     this.ctx = this.l.ctx;
     this.m = new L.Matrix(); // transformation matrix
@@ -94,11 +93,13 @@
 
     this.updateCoords();
     this.id = L.uuid();
+    E.init.call(this);
   }
 
-  E.prototype = {
-    constructor: E,
+  E.init = L.init;
 
+  E.fn = {
+    constructor: E,
     attr: function (args, options) {
 
       if (L.is('String', args)) {
@@ -249,65 +250,6 @@
       return gr;
     },
 
-    drag: function (start, move, end) {
-      this.on("dragstart", start || true);
-      this.on("dragmove", move || true);
-      this.on("dragend", end || true);
-      return this;
-    },
-
-    touch: function (start, move, end) {
-      this.on("touchstart", start || true);
-      this.on("touchmove", move || true);
-      this.on("touchend", end || true);
-      return this;
-    },
-
-    on: function (name, callback) {
-      this[name] = callback;
-      this.l.on(name, this);
-      return this;
-    },
-
-    off: function (name, callback) {
-      this[name] = callback;
-      this.l.off(name, this);
-      return this;
-    },
-
-    toFront: function () {
-      var index = this.l.elements.indexOf(this)
-        , elems = this.l.elements;
-
-      if (index < elems.length - 1) {
-        elems.splice(index, 1);
-        elems.push(this);
-        /*
-        events.forEach(function (name) {
-          var e = this.l.events[name];
-          if (e) {
-            var i = e.indexOf(this);
-            if (i > -1 && i != e.length - 1) {
-              e.splice(i, 1);
-              e.push(this);
-            }
-          }
-        }, this);
-        */
-        this.l.flags.mouseover = index;
-        this.redraw();
-      }
-    },
-
-    toBack: function () {
-      var index = this.l.elements.indexOf(this)
-        , elems = this.l.elements;
-
-      elems.splice(index, 1);
-      elems.unshift(this);
-      this.redraw();
-    },
-
     processPath: function (p) {
       for (c in p) {
         pathCommands[c].call(this, p[c]);
@@ -407,6 +349,7 @@
     return str[0] == "r" || str[0] == "l";
   }
 
+  E.prototype = E.fn;
   L.E = E;
 
 })(Leonardo);
