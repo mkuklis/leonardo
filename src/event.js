@@ -19,16 +19,13 @@
     },
 
     mousemove: function (pt, curIndex) {
-
       // handle drag
       if (this.flags.dragging) {
         this.attr({x: pt.x - this.attrs.dx, y: pt.y - this.attrs.dy});
-        //el.redraw();
       }
 
       // handle mouseover
       else if (!this.flags.over && isPointInRange(this, pt)) {
-
         var prevIndex = this.l.flags.mouseover;
         if (!prevIndex || curIndex > prevIndex || this.l.flags.dragging) {
           if (curIndex > prevIndex) {
@@ -144,25 +141,49 @@
   });
 
   E.fn.drag = function (start, move, end) {
-    this.on("dragstart", start || true);
-    this.on("dragmove", move || true);
-    this.on("dragend", end || true);
+    this.on("dragstart", start);
+    this.on("dragmove", move);
+    this.on("dragend", end);
+    return this;
+  }
+
+  E.fn.undrag = function () {
+    this.off("dragstart");
+    this.off("dragmove");
+    this.off("dragend");
     return this;
   }
 
   E.fn.on = function (event, fn) {
     this.callbacks[event] = this.callbacks[event] || [];
+    this.bind(emap[event] || event);
     if (fn) {
-      this.bind(emap[event] || event);
       this.callbacks[event].push(fn);
     }
+    return this;
   },
+
+  E.fn.off = function (event, fn) {
+    if (this.callbacks[event]) {
+      if (fn) {
+        var index = this.callbacks[event].indexOf(fn);
+        this.callbacks[event].splice(index, 1);
+      }
+      else {
+        delete this.callbacks[event];
+      }
+
+      this.unbind(emap[event] || event);
+    }
+
+    return this;
+  }
 
   E.fn.execCallbacks = function (event) {
     var callbacks = this.callbacks[event];
     if (callbacks) {
       for (var i = 0, l = callbacks.length; i < l; i++) {
-        L.is("Function", callbacks[i]) && callbacks[i]();
+        L.is("Function", callbacks[i]) && callbacks[i].call(this);
       }
     }
   }
@@ -172,13 +193,20 @@
       this.on(event, fn);
       return this;
     }
+
+    E.fn["un" + event] = function (fn) {
+      this.off(event, fn);
+      return this;
+    }
   });
 
   E.fn.toFront = function () {
     this.l.toFront(this);
     var index = this.reorder('mousedown');
-    this.l.flags.mouseover = index;
-    this.redraw();
+    if (index > -1) {
+      this.l.flags.mouseover = index;
+      this.redraw();
+    }
   }
 
   /*
@@ -196,14 +224,14 @@
   var ev = (function (slice) {
     var events = []; //shared by element and leo
 
-    function bind(event, fn) {
+    function bind(event) {
       events[event] = events[event] || [];
       events[event].push(this);
     }
 
-    function unbind(event, fn) {
+    function unbind(event) {
       if (!(event in events)) return;
-      events[event].splice(events[event].indexOf(fn), 1);
+      events[event].splice(events[event].indexOf(this), 1);
     }
 
     function reorder(event) {
@@ -213,9 +241,10 @@
       if (index < elems.length - 1) {
         elems.splice(index, 1);
         elems.push(this);
+        return index;
       }
 
-      return index;
+      return -1;
     }
 
     function trigger(event) {
