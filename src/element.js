@@ -277,7 +277,7 @@
     scale: function (sx, sy, cx, cy) {
       var a = this.attrs;
 
-      if (cx == undefined) {
+      if (typeof cx == "undefined") {
         cx = a.w/2;
         cy = a.h/2;
       }
@@ -287,7 +287,7 @@
       a.tx = -cx;
       a.ty = -cy;
 
-      this.t.push({c:"scale", sx: sx, sy: sy, cx: cx, cy: cy});
+      this.t.push({ c:"scale", sx: sx, sy: sy, cx: cx, cy: cy });
       this.redraw();
       return this;
     },
