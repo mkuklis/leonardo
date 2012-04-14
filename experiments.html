@@ -35,9 +35,12 @@
       console.log('click 2 rec2');
     });
 
-    rec3.drag(function () {
-      console.log('click 3 rec3');
-    });
+    //rec3.drag(function () {
+     // console.log('click 3 rec3');
+     //});
+    rec1.drag().animate({y: 200}, 1000);
+    rec2.drag().animate({x: 400, y: 200}, 500);
+    rec3.animate({x: 400}, 2000);
 
   </script>
 </html>

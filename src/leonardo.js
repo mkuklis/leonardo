@@ -75,9 +75,9 @@
     // redraws all elements
     redraw: function () {
       this.clear();
-      this.elements.forEach(function (el) {
-        el.draw();
-      });
+      for (var i = 0, l = this.elements.length; i < l; i++) {
+        this.elements[i].draw();
+      }
     },
 
     // clears paper, removes all elements

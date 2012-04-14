@@ -1,13 +1,13 @@
 // requestAnimationFrame shim
 //http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-(function() {
-  var lastTime = 0,
-      vendors = ['ms', 'moz', 'webkit', 'o'],
-      w = window;
 
-  for (var x = 0, l = vendors.length; x < l && !w.requestAnimationFrame; ++x) {
-    w.requestAnimationFrame = w[vendors[x]+'RequestAnimationFrame'];
-    w.cancelRequestAnimationFrame = w[vendors[x] + 'CancelRequestAnimationFrame'];
+(function(w) {
+  var lastTime = 0,
+      vendors = ['ms', 'moz', 'webkit', 'o'];
+
+  for (var i = 0, l = vendors.length; i < l && !w.requestAnimationFrame; ++i) {
+    w.requestAnimationFrame = w[vendors[i] + 'RequestAnimationFrame'];
+    w.cancelRequestAnimationFrame = w[vendors[i] + 'CancelRequestAnimationFrame'];
   }
 
   if (!w.requestAnimationFrame) {
@@ -27,26 +27,86 @@
       clearTimeout(id);
     };
   }
-}())
-
+}(window));
 
 (function (L) {
+
   var E = L.E;
 
-  function Animation() {
-    this.speed = 1000;
+  L.fn.animate = function () {
+    requestAnimationFrame(L.proxy(function () {
+      this.clear();
+
+      for (var i = 0, l = this.elements.length; i < l; i++) {
+        var el = this.elements[i];
+        el.processAnimations();
+        el.draw();
+      }
+
+      this.animate();
+    }, this));
   }
 
-  Animation.prototype = {
+  L.init(function () {
+    // TODO only do this when animations are present
+    this.animate();
+  });
 
+  // animation object
+  L.Animation = function (element, attrs, speed, easing) {
+
+    this.el = element;
+    this.time = 0;
+    this.ms = speed || 1000;
+    this.attrs = attrs;
+    this.easing = easing || "linear";
+
+    // velocity
+    this.vx = ((this.attrs.x || this.el.attrs.x) - this.el.attrs.x) / this.ms;
+    this.vy = ((this.attrs.y || this.el.attrs.y) - this.el.attrs.y) / this.ms;
+  }
+
+  L.Animation.prototype = {
+
+    stop: function () {
+      this.el.curAnimation = null;
+    },
+
+    step: function () {
+      var ct = new Date().getTime(),
+          dt = ct - (this.time || ct),
+          dx = dt * this.vx,
+          dy = dt * this.vy;
+
+      this.el.attrs.x = this.el.attrs.x + dx;
+      this.el.attrs.y = this.el.attrs.y + dy;
+
+      if ((this.attrs.x < (this.el.attrs.x + dx))
+          || (this.attrs.y < (this.el.attrs.y + dy))) {
+        this.stop();
+        //return;
+      }
+
+      this.time = ct;
+    }
   }
 
   E.init(function () {
-    this.animation = new Animation();
+    this.animations = [];
   });
 
-  E.fn.animate = function (attrs) {
-
+  E.fn.animate = function (attrs, speed) {
+    var anim = new L.Animation(this, attrs, speed);
+    this.animations.push(anim);
   }
 
+  E.fn.processAnimations = function () {
+    if (this.animations.length > 0 && !this.curAnimation) {
+      this.curAnimation = this.animations.shift();
+      this.curAnimation.step();
+    }
+    else if (this.curAnimation) {
+      this.curAnimation.step();
+    }
+  }
 })(Leonardo);
