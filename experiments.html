@@ -42,7 +42,10 @@
      //});
     //rec1.drag().animate({y: 200}, 1000);
     //rec2.drag().animate({x: 400, y: 200}, 500);
-    rec3.animate({x: 400}, 1000, "easeInQuad");
+    rec3
+    .animate({x: 400, y: 400}, "easeInQuad", 100)
+    .animate({x: 400, y: 100})
+    .animate({x: 100, y: 100});
 
   </script>
 </html>

@@ -167,6 +167,8 @@
     return obj !== undefined && obj !== null && clas === type;
   }
 
+  L.A = [];
+
   L.isAllN = function (o) {
     for (var i = 0, l = o.length; i < l; i++) {
       if (!L.is("Number", o[i])) {

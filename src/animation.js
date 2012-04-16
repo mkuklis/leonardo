@@ -27,18 +27,20 @@
   }
 
   /**
+   * Tween
+   *
    * sv - start value
    * ev - end value
    * st - start time
    * ms - duration
    * easing - easing function
    */
-  function Tween(sv, ev, ms, easing) {
+  function Tween(sv, ev, st, ms, easing) {
     this.sv = sv;
     this.ev = ev;
     this.dv = ev - sv;
-    this.st = L.now();
-    this.ms = ms || 1000;
+    this.st = st;
+    this.ms = ms;
     this.easing = easing || "easeInQuad";
   }
 
@@ -50,26 +52,42 @@
   };
 
   // animation object
-  L.Animation = function (element, attrs, speed, easing, callback) {
+  L.Animation = function (element, attrs, duration, easing, callback) {
     this.el = element;
     this.attrs = attrs;
-    this.tweens = [];
     this.callback = callback;
-    this.tweens.push(new Tween(this.el.attrs.x, this.attrs.x, speed, easing));
+    this.easing = easing;
+    this.duration = duration || 1000;
   }
 
   L.Animation.prototype = {
+    start: function () {
+      var tween;
+
+      this.tweens = [];
+      this.st = L.now();
+
+      for (attr in this.attrs) {
+        tween = new Tween(this.el.attrs[attr], this.attrs[attr],
+          this.st, this.duration, this.easing);
+        this.tweens.push({attr: attr, tween: tween});
+      }
+    },
+
     stop: function () {
       this.el.curAnimation = null;
-      this.callback && this.callback();
+      this.callback && this.callback.call(this.el);
     },
 
     step: function () {
+      var attr, tween;
       for (var i = 0, l = this.tweens.length; i < l; i++) {
-        this.el.attrs.x = this.tweens[i].run();
+        attr = this.tweens[i].attr,
+        tween = this.tweens[i].tween;
+        this.el.attrs[attr] = tween.run();
 
-        if (this.el.attrs.x > this.attrs.x) {
-          this.el.attrs.x = this.attrs.x;
+        if (L.now() >= (this.st + this.duration)) {
+          this.el.attrs[attr] = this.attrs[attr];
           this.stop();
         }
       }
@@ -80,15 +98,38 @@
     this.animations = [];
   });
 
-  E.fn.animate = function (attrs, speed) {
-    var anim = new L.Animation(this, attrs, speed);
+  E.fn.animate = function (props, options) {
+    var duration, easing, callback;
+
+    if (L.is("Object", options)) {
+      duration = options.duration,
+      easing = options.easing,
+      callback = options.callback;
+    }
+    else {
+      options = L.A.slice.call(arguments, 1);
+      for (var i = 0, l = options.length; i < l; i++) {
+        if (L.is("Function", options[i])) {
+          callback = options[i];
+        }
+        else if (L.is('Number', options[i])) {
+          duration = options[i];
+        }
+        else if (L.is('String', options[i])) {
+          easing = options[i];
+        }
+      }
+    }
+
+    var anim = new L.Animation(this, props, duration, easing, callback);
     this.animations.push(anim);
+    return this;
   }
 
   E.fn.processAnimations = function () {
     if (this.animations.length > 0 && !this.curAnimation) {
       this.curAnimation = this.animations.shift();
-      this.curAnimation.step();
+      this.curAnimation.start();
     }
     else if (this.curAnimation) {
       this.curAnimation.step();
