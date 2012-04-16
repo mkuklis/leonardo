@@ -196,8 +196,8 @@
         align.push('middle');
       }
 
-      this.ctx.textAlign = aligns[0];
-      this.ctx.textBaseline = aligns[1];
+      this.ctx.textAlign = align[0];
+      this.ctx.textBaseline = align[1];
       this.ctx.fillStyle = color;
       this.ctx.font = font;
       this.ctx.fillText(attrs.text, attrs.x - attrs.dx, attrs.y - attrs.dy);
