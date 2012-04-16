@@ -1,34 +1,3 @@
-// requestAnimationFrame shim
-//http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-
-(function(w) {
-  var lastTime = 0,
-      vendors = ['ms', 'moz', 'webkit', 'o'];
-
-  for (var i = 0, l = vendors.length; i < l && !w.requestAnimationFrame; ++i) {
-    w.requestAnimationFrame = w[vendors[i] + 'RequestAnimationFrame'];
-    w.cancelRequestAnimationFrame = w[vendors[i] + 'CancelRequestAnimationFrame'];
-  }
-
-  if (!w.requestAnimationFrame) {
-    w.requestAnimationFrame = function (callback, element) {
-        var currTime = new Date().getTime(),
-            timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-            id = w.setTimeout(function( ) { callback(currTime + timeToCall); },
-          timeToCall);
-
-        lastTime = currTime + timeToCall;
-        return id;
-    };
-  }
-
-  if (!w.cancelAnimationFrame) {
-    w.cancelAnimationFrame = function (id) {
-      clearTimeout(id);
-    };
-  }
-}(window));
-
 (function (L) {
 
   var E = L.E;
@@ -52,42 +21,58 @@
     this.animate();
   });
 
+  // returns current time
+  L.now = function () {
+    return (Date.now) ? Date.now() : new Date().getTime();
+  }
+
+  /**
+   * sv - start value
+   * ev - end value
+   * st - start time
+   * ms - duration
+   * easing - easing function
+   */
+  function Tween(sv, ev, ms, easing) {
+    this.sv = sv;
+    this.ev = ev;
+    this.dv = ev - sv;
+    this.st = L.now();
+    this.ms = ms || 1000;
+    this.easing = easing || "easeInQuad";
+  }
+
+  Tween.prototype = {
+    run: function () {
+      var dt = L.now() - this.st;
+      return this.dv * L.easings[this.easing](dt / this.ms) + this.sv;
+    }
+  };
+
   // animation object
-  L.Animation = function (element, attrs, speed, easing) {
-
+  L.Animation = function (element, attrs, speed, easing, callback) {
     this.el = element;
-    this.time = 0;
-    this.ms = speed || 1000;
     this.attrs = attrs;
-    this.easing = easing || "linear";
-
-    // velocity
-    this.vx = ((this.attrs.x || this.el.attrs.x) - this.el.attrs.x) / this.ms;
-    this.vy = ((this.attrs.y || this.el.attrs.y) - this.el.attrs.y) / this.ms;
+    this.tweens = [];
+    this.callback = callback;
+    this.tweens.push(new Tween(this.el.attrs.x, this.attrs.x, speed, easing));
   }
 
   L.Animation.prototype = {
-
     stop: function () {
       this.el.curAnimation = null;
+      this.callback && this.callback();
     },
 
     step: function () {
-      var ct = new Date().getTime(),
-          dt = ct - (this.time || ct),
-          dx = dt * this.vx,
-          dy = dt * this.vy;
+      for (var i = 0, l = this.tweens.length; i < l; i++) {
+        this.el.attrs.x = this.tweens[i].run();
 
-      this.el.attrs.x = this.el.attrs.x + dx;
-      this.el.attrs.y = this.el.attrs.y + dy;
-
-      if ((this.attrs.x < (this.el.attrs.x + dx))
-          || (this.attrs.y < (this.el.attrs.y + dy))) {
-        this.stop();
-        //return;
+        if (this.el.attrs.x > this.attrs.x) {
+          this.el.attrs.x = this.attrs.x;
+          this.stop();
+        }
       }
-
-      this.time = ct;
     }
   }
 
