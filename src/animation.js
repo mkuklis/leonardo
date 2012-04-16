@@ -52,10 +52,11 @@
   };
 
   // animation object
-  L.Animation = function (element, attrs, duration, easing, callback) {
+  L.Animation = function (element, attrs, duration, easing, step, end) {
     this.el = element;
     this.attrs = attrs;
-    this.callback = callback;
+    this.stepFn = step;
+    this.endFn = end;
     this.easing = easing;
     this.duration = duration || 1000;
   }
@@ -76,7 +77,7 @@
 
     stop: function () {
       this.el.curAnimation = null;
-      this.callback && this.callback.call(this.el);
+      this.endFn && this.endFn.call(this.el);
     },
 
     step: function () {
@@ -85,6 +86,7 @@
         attr = this.tweens[i].attr,
         tween = this.tweens[i].tween;
         this.el.attrs[attr] = tween.run();
+        this.stepFn && this.stepFn.call(this.el);
 
         if (L.now() >= (this.st + this.duration)) {
           this.el.attrs[attr] = this.attrs[attr];
@@ -99,18 +101,19 @@
   });
 
   E.fn.animate = function (props, options) {
-    var duration, easing, callback;
+    var duration, easing, step, end;
 
     if (L.is("Object", options)) {
       duration = options.duration,
       easing = options.easing,
-      callback = options.callback;
+      end = options.end,
+      step = options.step;
     }
     else {
       options = L.A.slice.call(arguments, 1);
       for (var i = 0, l = options.length; i < l; i++) {
         if (L.is("Function", options[i])) {
-          callback = options[i];
+          end = options[i];
         }
         else if (L.is('Number', options[i])) {
           duration = options[i];
@@ -121,7 +124,7 @@
       }
     }
 
-    var anim = new L.Animation(this, props, duration, easing, callback);
+    var anim = new L.Animation(this, props, duration, easing, step, end);
     this.animations.push(anim);
     return this;
   }
