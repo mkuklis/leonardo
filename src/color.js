@@ -71,22 +71,18 @@
     },
 
     d2c: function (decA) {
-      return "#" + this.toHex(decA[0]) + this.toHex(decA[1]) + this.toHex(decA[2]);
+      return "#" + this.d2h(decA[0]) + this.d2h(decA[1]) + this.d2h(decA[2]);
     },
 
-    rgbToHex: function (r, g, b) {
-      return this.toHex(r) + this.toHex(g) + this.toHex(b);
-    },
-
-    d2h: function (d) {
-      return d.toString(16);
+    rgb2h: function (r, g, b) {
+      return this.d2h(r) + this.d2h(g) + this.d2h(b);
     },
 
     h2d: function (h) {
       return parseInt(h, 16);
     },
 
-    toHex: function (n) {
+    d2h: function (n) {
       n = parseInt(n, 10);
       if (isNaN(n)) return "00";
       n = Math.max(0, Math.min(n, 255));
