@@ -38,7 +38,6 @@
   function Tween(sv, ev, st, ms, easing) {
     this.sv = sv;
     this.ev = ev;
-    this.dv = ev - sv;
     this.st = st;
     this.ms = ms;
     this.easing = easing || "easeInQuad";
@@ -46,8 +45,36 @@
 
   Tween.prototype = {
     run: function () {
-      var dt = L.now() - this.st;
-      return this.dv * L.easings[this.easing](dt / this.ms) + this.sv;
+      var result = [];
+      if (L.is("Array", this.ev)) {
+        for (var i = 0, l = this.ev.length; i < l; i++) {
+          result.push(this.process(this.sv[i], this.ev[i]));
+        }
+        return result;
+      }
+      else {
+        return this.process(this.sv, this.ev);
+      }
+    },
+
+    // ev - end value
+    // sv - start value
+    process: function (sv, ev) {
+      var nv = (ev - sv) * L.easings[this.easing]((L.now() - this.st) / this.ms) + sv;
+      return (ev > sv) ? ((nv > ev) ? ev : nv) : ((nv < ev) ? ev : nv);
+    }
+  };
+
+  // tween converters
+  var from = {
+    fill: function (color) {
+      return L.C.c2d(color);
+    }
+  };
+
+  var to = {
+    fill: function (color) {
+      return L.C.d2c(color);
     }
   };
 
@@ -63,16 +90,28 @@
 
   L.Animation.prototype = {
     start: function () {
-      var tween;
+      var st, ev, convert
 
       this.tweens = [];
-      this.st = L.now();
 
       for (attr in this.attrs) {
-        tween = new Tween(this.el.attrs[attr], this.attrs[attr],
-          this.st, this.duration, this.easing);
-        this.tweens.push({attr: attr, tween: tween});
+        convert = from[attr];
+
+        if (convert) {
+          sv = convert(this.el.attrs[attr]);
+          ev = convert(this.attrs[attr]);
+          this.addTween(sv, ev);
+        }
+        else {
+          this.addTween(this.el.attrs[attr], this.attrs[attr]);
+        }
       }
+    },
+
+    addTween: function (sv, ev) {
+      this.st = L.now();
+      var tween = new Tween(sv, ev, this.st, this.duration, this.easing);
+      this.tweens.push({attr: attr, tween: tween});
     },
 
     stop: function () {
@@ -81,12 +120,15 @@
     },
 
     step: function () {
-      var attr, tween;
-      for (var i = 0, l = this.tweens.length; i < l; i++) {
-        attr = this.tweens[i].attr,
+      var attr, tween, val, convert, i;
+
+      for (i = 0, l = this.tweens.length; i < l; i++) {
+        attr = this.tweens[i].attr;
         tween = this.tweens[i].tween;
-        this.el.attrs[attr] = tween.run();
-        this.stepFn && this.stepFn.call(this.el);
+        convert = to[attr];
+        val = tween.run();
+
+        this.el.attrs[attr] = (convert) ? convert(val) : val;
 
         if (L.now() >= (this.st + this.duration)) {
           this.el.attrs[attr] = this.attrs[attr];

@@ -1,0 +1,45 @@
+<html>
+  <head></head>
+  <body>
+      <canvas width="400" height="400" id="canvas"></canvas>
+  </body>
+  <script src="src/leonardo.js"></script>
+  <script src="src/matrix.js"></script>
+  <script src="src/color.js"></script>
+  <script src="src/element.js"></script>
+  <script src="src/event.js"></script>
+  <script src="src/polyfill.js"></script>
+  <script src="src/easings.js"></script>
+  <script src="src/animation.js"></script>
+
+  <script>
+    var leo = new Leonardo(0, 0, 1200, 800);
+    var x = 10, rect, color, rects = [], easings = [];
+
+    for (easing in Leonardo.easings) {
+      rect = leo.rect(x, 600, 30, 30);
+      color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+      rect.attr({fill: color});
+      x += 35;
+      rects.push(rect);
+      easings.push(easings);
+    }
+
+    setInterval(function () {
+      var time = Math.floor((Math.random() * 2000)),
+          max = rects.length;
+
+      setTimeout(function () {
+        var i = Math.floor((Math.random() * max)),
+            j = Math.floor((Math.random() * max)),
+            k = Math.floor((Math.random() * max)),
+            l = Math.floor((Math.random() * 580));
+
+        rects[i]
+          .animate({y: l}, 2000, easings[j])
+          .animate({y: 600}, 2000, easings[k]);
+      }, time);
+    }, 500);
+  </script>
+</html>
+

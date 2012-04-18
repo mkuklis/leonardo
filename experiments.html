@@ -14,67 +14,25 @@
 
   <script>
     var leo = new Leonardo(0, 0, 1200, 800);
-    var x = 10, rect, color, rects = [], easings = [];
+    var shapes = ["rect", "circle"], els = [];
 
-    for (easing in Leonardo.easings) {
-      rect = leo.rect(x, 600, 30, 30);
-      color = '#' + Math.floor(Math.random() * 16777215).toString(16);
-      rect.attr({fill: color});
-      x += 35;
-      rects.push(rect);
-      easings.push(easings);
+    //file://localhost/Users/mkuklis/Documents/projects/javascript/leonardo/experiments.html
+    for (var i = 0; i < 100; i++) {
+      var shape = shapes[Math.floor(Math.random() * 2)];
+      var x = Math.floor(Math.random() * 1100);
+      var y = Math.floor(Math.random() * 700);
+      var w = Math.floor(Math.random() * 100);
+      var h = Math.floor(Math.random() * 100);
+      var el = leo[shape](x, y, w, h);
+      els.push(el);
     }
 
     setInterval(function () {
-      var time = Math.floor((Math.random() * 2000)),
-          max = rects.length;
-
-      setTimeout(function () {
-        var i = Math.floor((Math.random() * max)),
-            j = Math.floor((Math.random() * max)),
-            k = Math.floor((Math.random() * max)),
-            l = Math.floor((Math.random() * 580));
-
-        rects[i]
-          .animate({y: l}, 2000, easings[j])
-          .animate({y: 600}, 2000, easings[k]);
-      }, time);
-    }, 500);
-
-    /*
-    var rec1 = leo.rect(10, 10, 100, 100);
-    var rec2 = leo.rect(115, 115, 100, 100);
-    var rec3 = leo.rect(0, 80, 100, 100);
-
-    rec1.attr({fill: "#ff0000"});
-    rec2.attr({fill: "#00ff00"});
-    rec3.attr({fill: "#0000ff"});
-
-    rec1.drag(function () {
-      console.log('start');
-    },
-    function () {
-      console.log('dragging..');
-    },
-    function () {
-      this.undrag();
-    });
-
-    rec2.drag(function () {
-      console.log('click 2 rec2');
-    });
-
-
-
-    //rec3.drag(function () {
-     // console.log('click 3 rec3');
-     //});
-    rec1.drag().animate({y: 200}, 1000);
-    rec2.drag().animate({x: 400, y: 200}, 500);
-    rec3
-    .animate({x: 400, y: 400}, "easeInQuad", 100)
-    .animate({x: 400, y: 100})
-    .animate({x: 100, y: 100});
-*/
-  </script>
+      for (var i = 0; i < 100; i++) {
+        var nx = Math.floor(Math.random() * 1100);
+        var ny = Math.floor(Math.random() * 700);
+        els[i].animate({x: nx, y: ny}, 1000);
+      }
+    }, 1000);
+ </script>
 </html>

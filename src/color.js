@@ -5,7 +5,8 @@
     singleHexRegex: /^([a-f0-9])([a-f0-9])([a-f0-9])$/i,
     tripleHexRegex: /^([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i,
 
-    hex2rgb: function (hex) {
+    // hex to rgb
+    h2rgb: function (hex) {
       var hex = (hex[0] == "#") ? hex.substr(1) : hex;
 
       if (hex.length == 3) {
@@ -15,12 +16,12 @@
         }
       }
 
-      var triplets = this.tripleHexRegex.exec(hex).slice(1);
+      var trio = this.tripleHexRegex.exec(hex).slice(1);
 
       return {
-        r: parseInt(triplets[0], 16),
-        g: parseInt(triplets[1], 16),
-        b: parseInt(triplets[2], 16)
+        r: parseInt(trio[0], 16),
+        g: parseInt(trio[1], 16),
+        b: parseInt(trio[2], 16)
       };
     },
 
@@ -56,7 +57,7 @@
           return color;
         }
         else if (color.charAt() === "#") {
-          var rgb = this.hex2rgb(color);
+          var rgb = this.h2rgb(color);
           return "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")";
         }
         else if (color.indexOf('rgb') > -1) {
@@ -69,8 +70,20 @@
       return color;
     },
 
+    d2c: function (decA) {
+      return "#" + this.toHex(decA[0]) + this.toHex(decA[1]) + this.toHex(decA[2]);
+    },
+
     rgbToHex: function (r, g, b) {
       return this.toHex(r) + this.toHex(g) + this.toHex(b);
+    },
+
+    d2h: function (d) {
+      return d.toString(16);
+    },
+
+    h2d: function (h) {
+      return parseInt(h, 16);
     },
 
     toHex: function (n) {
@@ -78,6 +91,11 @@
       if (isNaN(n)) return "00";
       n = Math.max(0, Math.min(n, 255));
       return "0123456789ABCDEF".charAt((n - n % 16) / 16) + "0123456789ABCDEF".charAt(n % 16);
+    },
+
+    c2d: function (color) {
+      var rgb = this.h2rgb(color);
+      return [rgb.r, rgb.g, rgb.b];
     }
   };
 })(Leonardo);
