@@ -32,11 +32,15 @@
   L.fn = {
     constructor: L,
     // create circle element
-    circle: function (x, y, r, attrs) {
+    circle: function (x, y, r, attrs, options) {
       var pos = { x: x || 0, y: y || 0, r: r || 0 }
         , circle = L.E('circle', L.extend(pos, attrs), this);
+      options = options || {};
 
-      circle.draw();
+      if (!options.silent) {
+        circle.draw();
+      }
+
       return circle;
     },
 

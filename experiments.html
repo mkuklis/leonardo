@@ -1,8 +1,8 @@
 <html>
   <head></head>
   <body>
-      <canvas width="400" height="400" id="canvas"></canvas>
-  </body>
+    <canvas width="400" height="400" id="canvas"></canvas>
+      <div style="position: absolute; left: 600px;" id="logEl"></div>
   <script src="src/leonardo.js"></script>
   <script src="src/matrix.js"></script>
   <script src="src/color.js"></script>
@@ -13,7 +13,25 @@
   <script src="src/animation.js"></script>
 
   <script>
-    var leo = new Leonardo(0, 0, 1200, 800);
+
+    function getRandomNum(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+  window.onload = function() {
+    var leo = new Leonardo(0, 0, 500, 500);
+    var startTime = new Date();
+    for (var i = 1000; i--; ) {
+      leo.circle(
+        getRandomNum(0, 500),
+        getRandomNum(0, 500),
+        20, {fill: '#ff0000', stroke: '0000ff'}, {silent: true}).drag();
+    }
+    leo.redraw();
+    var et = new Date();
+    //canvas.renderAll();
+    document.getElementById('logEl').innerHTML = 'leo: <b class="bench">' + (et - startTime) + '</b> ms';
+  }
+    /*
     var shapes = ["rect", "circle"], els = [];
 
     //file://localhost/Users/mkuklis/Documents/projects/javascript/leonardo/experiments.html
@@ -38,5 +56,7 @@
         els[i].animate({x: nx, y: ny, fill: color}, 1000);
       }
     }, 1000);
- </script>
+    */
+  </script>
+  </body>
 </html>

@@ -11,7 +11,6 @@
         el.processAnimations();
         el.draw();
       }
-
       this.animate();
     }, this));
   }
@@ -62,6 +61,10 @@
     process: function (sv, ev) {
       var nv = (ev - sv) * L.easings[this.easing]((L.now() - this.st) / this.ms) + sv;
       return (ev > sv) ? ((nv > ev) ? ev : nv) : ((nv < ev) ? ev : nv);
+    },
+
+    updateTime: function (delta) {
+      this.st += delta;
     }
   };
 
@@ -79,13 +82,35 @@
   };
 
   // animation object
-  L.Animation = function (element, attrs, duration, easing, step, end) {
+  L.Animation = function (element, attrs, opts) {
+
     this.el = element;
     this.attrs = attrs;
-    this.stepFn = step;
-    this.endFn = end;
-    this.easing = easing;
-    this.duration = duration || 1000;
+    this.status = "play";
+
+    if (L.is("Object", opts)) {
+      this.duration = opts.duration;
+      this.easing = opts.easing,
+      this.endFn = opts.end,
+      this.stepFn = opts.step;
+    }
+    else {
+      opts = L.A.slice.call(arguments, 2);
+      for (var i = 0, l = opts.length; i < l; i++) {
+        if (L.is("Function", opts[i])) {
+          this.endFn = opts[i];
+        }
+        else if (L.is('Number', opts[i])) {
+          this.duration = opts[i];
+        }
+        else if (L.is('String', opts[i])) {
+          this.easing = opts[i];
+        }
+      }
+    }
+
+    this.duration = this.duration || 400;
+    this.easing = this.easing || "easeInQuad";
   }
 
   L.Animation.prototype = {
@@ -114,15 +139,33 @@
       this.tweens.push({attr: attr, tween: tween});
     },
 
+    resume: function () {
+      var delta = L.now() - this.ptime;
+      for (var i = 0, l = this.tweens.length; i < l; i++) {
+        this.tweens[i].tween.updateTime(delta);
+      }
+
+      this.status = "play";
+    },
+
     stop: function () {
-      this.el.curAnimation = null;
+      // use pub/sub
+      this.el.curAnim = null;
       this.endFn && this.endFn.call(this.el);
     },
 
-    step: function () {
-      var attr, tween, val, convert, i;
+    isActive: function () {
+      return this.status == "play";
+    },
 
-      for (i = 0, l = this.tweens.length; i < l; i++) {
+    pause: function () {
+      this.ptime = L.now();
+      this.status = "pause";
+    },
+
+    step: function () {
+      var attr, tween, val, convert;
+      for (var i = 0, l = this.tweens.length; i < l; i++) {
         attr = this.tweens[i].attr;
         tween = this.tweens[i].tween;
         convert = to[attr];
@@ -130,8 +173,9 @@
 
         this.el.attrs[attr] = (convert) ? convert(val) : val;
 
-        if (L.now() >= (this.st + this.duration)) {
-          this.el.attrs[attr] = this.attrs[attr];
+        if (this.el.attrs[attr] == this.attrs[attr]) {
+          //if (L.now() >= (this.st + this.duration)) {
+          //this.el.attrs[attr] = this.attrs[attr];
           this.stop();
         }
       }
@@ -139,45 +183,37 @@
   }
 
   E.init(function () {
+    // animation queue
     this.animations = [];
   });
 
-  E.fn.animate = function (props, options) {
-    var duration, easing, step, end;
-
-    if (L.is("Object", options)) {
-      duration = options.duration,
-      easing = options.easing,
-      end = options.end,
-      step = options.step;
-    }
-    else {
-      options = L.A.slice.call(arguments, 1);
-      for (var i = 0, l = options.length; i < l; i++) {
-        if (L.is("Function", options[i])) {
-          end = options[i];
-        }
-        else if (L.is('Number', options[i])) {
-          duration = options[i];
-        }
-        else if (L.is('String', options[i])) {
-          easing = options[i];
-        }
-      }
-    }
-
-    var anim = new L.Animation(this, props, duration, easing, step, end);
+  E.fn.animate = function (props, opts) {
+    var anim = new L.Animation(this, props, opts);
     this.animations.push(anim);
     return this;
   }
 
+  E.fn.pause = function () {
+    if (this.curAnim && this.curAnim.isActive()) {
+      this.curAnim.pause();
+    }
+  }
+
+  E.fn.resume = function () {
+    if (this.curAnim && !this.curAnim.isActive()) {
+      this.curAnim.resume();
+    }
+  }
+
   E.fn.processAnimations = function () {
-    if (this.animations.length > 0 && !this.curAnimation) {
-      this.curAnimation = this.animations.shift();
-      this.curAnimation.start();
+    if (this.animations.length > 0 && !this.curAnim) {
+      this.curAnim = this.animations.shift();
+      this.curAnim.start();
     }
-    else if (this.curAnimation) {
-      this.curAnimation.step();
+    else if (this.curAnim && this.curAnim.isActive()) {
+      this.curAnim.step();
     }
+
+    return this;
   }
 })(Leonardo);
