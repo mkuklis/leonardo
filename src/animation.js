@@ -2,23 +2,25 @@
 
   var E = L.E;
 
+  L.init(function () {
+    // TODO only do this when animations are present
+    this.animate();
+  });
+
+  // leonardo animation api
   L.fn.animate = function () {
     requestAnimationFrame(L.proxy(function () {
       this.clear();
 
       for (var i = 0, l = this.elements.length; i < l; i++) {
         var el = this.elements[i];
-        el.processAnimations();
+        el.processFx();
         el.draw();
       }
+
       this.animate();
     }, this));
   }
-
-  L.init(function () {
-    // TODO only do this when animations are present
-    this.animate();
-  });
 
   // returns current time
   L.now = function () {
@@ -26,7 +28,7 @@
   }
 
   /**
-   * Tween
+   * Low level animation tween
    *
    * sv - start value
    * ev - end value
@@ -133,6 +135,8 @@
       }
     },
 
+    // sv - start value
+    // ev  end value
     addTween: function (sv, ev) {
       this.st = L.now();
       var tween = new Tween(sv, ev, this.st, this.duration, this.easing);
@@ -165,6 +169,7 @@
 
     step: function () {
       var attr, tween, val, convert;
+
       for (var i = 0, l = this.tweens.length; i < l; i++) {
         attr = this.tweens[i].attr;
         tween = this.tweens[i].tween;
@@ -187,6 +192,8 @@
     this.animations = [];
   });
 
+  // element fx api
+
   E.fn.animate = function (props, opts) {
     var anim = new L.Animation(this, props, opts);
     this.animations.push(anim);
@@ -205,7 +212,8 @@
     }
   }
 
-  E.fn.processAnimations = function () {
+  // TODO: make this private?
+  E.fn.processFx = function () {
     if (this.animations.length > 0 && !this.curAnim) {
       this.curAnim = this.animations.shift();
       this.curAnim.start();
