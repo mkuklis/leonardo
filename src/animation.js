@@ -2,22 +2,17 @@
 
   var E = L.E;
 
-  L.init(function () {
-    // TODO only do this when animations are present
-    this.animate();
-  });
-
   // leonardo animation api
   L.fn.animate = function () {
     requestAnimationFrame(L.proxy(function () {
-      this.clear();
-
-      for (var i = 0, l = this.elements.length; i < l; i++) {
-        var el = this.elements[i];
-        el.processFx();
-        el.draw();
+      if (this.fxcounter > 0) {
+        this.clear();
+        for (var i = 0, l = this.elements.length; i < l; i++) {
+          var el = this.elements[i];
+          el.processFx();
+          el.draw();
+        }
       }
-
       this.animate();
     }, this));
   }
@@ -27,8 +22,22 @@
     return (Date.now) ? Date.now() : new Date().getTime();
   }
 
+  L.init(function () {
+    // # of fx elements
+    this.fxcounter = 0;
+    this.ev.on('fx:add', function () {
+      this.fxcounter += 1;
+    }, this);
+
+    this.ev.on('fx:remove', function () {
+      this.fxcounter -= 1;
+    }, this);
+
+    this.animate();
+  });
+
   /**
-   * Low level animation tween
+   * animation tween
    *
    * sv - start value
    * ev - end value
@@ -156,6 +165,7 @@
       // use pub/sub
       this.el.curAnim = null;
       this.endFn && this.endFn.call(this.el);
+      this.el.ev.trigger('fx:remove', this);
     },
 
     isActive: function () {
@@ -168,7 +178,7 @@
     },
 
     step: function () {
-      var attr, tween, val, convert;
+      var attr, tween, val, convert, done = false;
 
       for (var i = 0, l = this.tweens.length; i < l; i++) {
         attr = this.tweens[i].attr;
@@ -177,13 +187,10 @@
         val = tween.run();
 
         this.el.attrs[attr] = (convert) ? convert(val) : val;
-
-        if (this.el.attrs[attr] == this.attrs[attr]) {
-          //if (L.now() >= (this.st + this.duration)) {
-          //this.el.attrs[attr] = this.attrs[attr];
-          this.stop();
-        }
+        done = (this.el.attrs[attr] == this.attrs[attr]);
       }
+
+      done && this.stop();
     }
   }
 
@@ -196,6 +203,8 @@
 
   E.fn.animate = function (props, opts) {
     var anim = new L.Animation(this, props, opts);
+    this.ev.trigger('fx:add', this);
+
     this.animations.push(anim);
     return this;
   }

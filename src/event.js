@@ -128,7 +128,7 @@
     for (var i = 0, l = cevents.length; i < l; i++) {
       (L.proxy(function (event) {
         this.canvas.addEventListener(event, L.proxy(function (e) {
-          this.trigger(event, getPos(e));
+          this.ev.trigger(event, getPos(e));
           e.preventDefault();
         }, this));
       }, this))(cevents[i]);
@@ -156,7 +156,8 @@
 
   E.fn.on = function (event, fn) {
     this.callbacks[event] = this.callbacks[event] || [];
-    this.bind(emap[event] || event);
+    this.ev.on(emap[event] || event, handlers[emap[event]]);
+
     if (fn) {
       this.callbacks[event].push(fn);
     }
@@ -173,7 +174,7 @@
         delete this.callbacks[event];
       }
 
-      this.unbind(emap[event] || event);
+      this.ev.off(emap[event] || event);
     }
 
     return this;
@@ -220,53 +221,7 @@
   }
   */
 
-  // pub/sub module
-  var ev = (function (slice) {
-    var events = []; //shared by element and leo
-
-    function bind(event) {
-      events[event] = events[event] || [];
-      events[event].push(this);
-    }
-
-    function unbind(event) {
-      if (!(event in events)) return;
-      events[event].splice(events[event].indexOf(this), 1);
-    }
-
-    function reorder(event) {
-      var elems = events[event],
-          index = elems.indexOf(this);
-
-      if (index < elems.length - 1) {
-        elems.splice(index, 1);
-        elems.push(this);
-        return index;
-      }
-
-      return -1;
-    }
-
-    function trigger(event) {
-      var args, binds;
-      if (!(event in events)) return;
-      args = slice.call(arguments, 1);
-      binds = events[event];
-      for (var i = binds.length - 1; i >= 0; i--) {
-        handlers[event].apply(binds[i], args);
-      }
-    }
-
-    return function () {
-      this.reorder = reorder;
-      this.bind = bind;
-      this.unbind = unbind;
-      this.trigger = trigger;
-      return this;
-    };
-  })([].slice);
-
-  ev.call(L.prototype);
-  ev.call(L.E.prototype);
+  L.ev.call(L.prototype);
+  L.ev.call(L.E.prototype);
 
 })(Leonardo);

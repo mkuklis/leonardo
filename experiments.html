@@ -7,6 +7,7 @@
   <script src="src/matrix.js"></script>
   <script src="src/color.js"></script>
   <script src="src/element.js"></script>
+  <script src="src/pubsub.js"></script>
   <script src="src/event.js"></script>
   <script src="src/polyfill.js"></script>
   <script src="src/easings.js"></script>
@@ -17,24 +18,24 @@
     function getRandomNum(min, max) {
       return Math.random() * (max - min) + min;
     }
-  window.onload = function() {
-    var leo = new Leonardo(0, 0, 500, 500);
-    var startTime = new Date();
-    for (var i = 1000; i--; ) {
-      leo.circle(
-        getRandomNum(0, 500),
-        getRandomNum(0, 500),
-        20, {fill: '#ff0000', stroke: '0000ff'}, {silent: true}).drag();
+    window.onload = function() {
+      var leo = new Leonardo(0, 0, 500, 500);
+      var startTime = new Date();
+      for (var i = 1000; i--; ) {
+        leo.circle(
+          getRandomNum(0, 500),
+          getRandomNum(0, 500),
+          20, {fill: '#ff0000', stroke: '0000ff'}, {silent: true}).drag();
+      }
+      leo.redraw();
+      var et = new Date();
+      //canvas.renderAll();
+      document.getElementById('logEl').innerHTML = 'leo: <b class="bench">' + (et - startTime) + '</b> ms';
     }
-    leo.redraw();
-    var et = new Date();
-    //canvas.renderAll();
-    document.getElementById('logEl').innerHTML = 'leo: <b class="bench">' + (et - startTime) + '</b> ms';
-  }
+
     /*
     var shapes = ["rect", "circle"], els = [];
 
-    //file://localhost/Users/mkuklis/Documents/projects/javascript/leonardo/experiments.html
     for (var i = 0; i < 100; i++) {
       var shape = shapes[Math.floor(Math.random() * 2)];
       var x = Math.floor(Math.random() * 1100);

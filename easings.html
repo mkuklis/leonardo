@@ -8,6 +8,7 @@
     <script src="src/matrix.js"></script>
     <script src="src/color.js"></script>
     <script src="src/element.js"></script>
+    <script src="src/pubsub.js"></script>
     <script src="src/event.js"></script>
     <script src="src/polyfill.js"></script>
     <script src="src/easings.js"></script>
@@ -15,7 +16,14 @@
 
     <script>
       var leo = new Leonardo(0, 0, 1200, 650);
+
       var x = 10, rect, color, rects = [], easings = [];
+      var circle = leo.circle(100, 100, 50, {fill: '#ff0000'});
+
+      circle
+        .animate({x: 200, y: 200}, 2000, 'easeInQuad')
+        .animate({x: 200, y: 500}, 2000, 'easeInQuad');
+
 
       document.getElementById('pause').addEventListener('click', function () {
         for (var i = 0, l = rects.length; i < l; i++) {
@@ -28,6 +36,7 @@
           rects[i].resume();
         }
       });
+
 
       for (easing in Leonardo.easings) {
         rect = leo.rect(x, 600, 30, 30);
