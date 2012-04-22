@@ -167,8 +167,12 @@
   };
 
   L.is = function (type, obj) {
-    var clas = Object.prototype.toString.call(obj).slice(8, -1);
-    return obj !== undefined && obj !== null && clas === type;
+    var clas = L.typeOf(obj);
+    return typeof obj != "undefined" && obj !== null && clas === type;
+  }
+
+  L.typeOf = function (obj) {
+    return Object.prototype.toString.call(obj).slice(8, -1);
   }
 
   L.A = [];

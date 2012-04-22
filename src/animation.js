@@ -92,36 +92,40 @@
     }
   };
 
-  // animation object
-  L.Animation = function (element, attrs, opts) {
-
-    this.el = element;
-    this.attrs = attrs;
-    this.status = "play";
-
-    if (L.is("Object", opts)) {
+  var argTypes = {
+    "Function": function (arg) {
+      this.endFn = arg;
+    },
+    "Number": function (arg) {
+      this.duration = arg;
+    },
+    "String": function (arg) {
+      this.easing = arg;
+    },
+    "Object": function (opts) {
       this.duration = opts.duration;
       this.easing = opts.easing,
       this.endFn = opts.end,
       this.stepFn = opts.step;
     }
-    else {
-      opts = L.A.slice.call(arguments, 2);
-      for (var i = 0, l = opts.length; i < l; i++) {
-        if (L.is("Function", opts[i])) {
-          this.endFn = opts[i];
-        }
-        else if (L.is('Number', opts[i])) {
-          this.duration = opts[i];
-        }
-        else if (L.is('String', opts[i])) {
-          this.easing = opts[i];
-        }
-      }
+  };
+
+  // animation object
+  L.Animation = function (element, attrs, opts) {
+    var opts = L.A.slice.call(arguments, 2);
+
+    this.el = element;
+    this.attrs = attrs;
+    this.status = "play";
+
+    for (var i = 0, l = opts.length; i < l; i++) {
+      var opt = opts[i];
+      argTypes[L.typeOf(opt)].call(this, opt);
     }
 
     this.duration = this.duration || 400;
     this.easing = this.easing || "easeInQuad";
+
   }
 
   L.Animation.prototype = {
