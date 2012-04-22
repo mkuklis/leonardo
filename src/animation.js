@@ -112,9 +112,10 @@
 
   // animation object
   L.Animation = function (element, attrs, opts) {
-    var opts = L.A.slice.call(arguments, 2);
+    opts = L.A.slice.call(arguments, 2);
 
     this.el = element;
+    this.sttrs = element.attrs; // start attrs
     this.attrs = attrs;
     this.status = "play";
 
@@ -125,7 +126,6 @@
 
     this.duration = this.duration || 400;
     this.easing = this.easing || "easeInQuad";
-
   }
 
   L.Animation.prototype = {
@@ -138,12 +138,12 @@
         convert = from[attr];
 
         if (convert) {
-          sv = convert(this.el.attrs[attr]);
+          sv = convert(this.sttrs[attr]);
           ev = convert(this.attrs[attr]);
           this.addTween(sv, ev);
         }
         else {
-          this.addTween(this.el.attrs[attr], this.attrs[attr]);
+          this.addTween(this.sttrs[attr], this.attrs[attr]);
         }
       }
     },
@@ -166,7 +166,7 @@
     },
 
     stop: function () {
-      // use pub/sub
+      // TODO: use pub/sub
       this.el.curAnim = null;
       this.endFn && this.endFn.call(this.el);
       this.el.ev.trigger('fx:remove', this);
@@ -190,8 +190,8 @@
         convert = to[attr];
         val = tween.run();
 
-        this.el.attrs[attr] = (convert) ? convert(val) : val;
-        done = (this.el.attrs[attr] == this.attrs[attr]);
+        this.sttrs[attr] = (convert) ? convert(val) : val;
+        done = (this.sttrs[attr] == this.attrs[attr]);
       }
 
       done && this.stop();
