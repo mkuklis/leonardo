@@ -79,10 +79,12 @@
     },
 
     // redraws all elements
-    redraw: function () {
+    redraw: function (callback) {
       this.clear();
       for (var i = 0, l = this.elements.length; i < l; i++) {
-        this.elements[i].draw();
+        var el = this.elements[i];
+        callback && callback.call(this, el);
+        el.draw();
       }
     },
 

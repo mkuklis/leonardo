@@ -72,6 +72,8 @@
       return new E(type, attrs, leonardo, options);
     }
 
+    options = options || {};
+
     this.type = type;
     this.attrs = attrs;
     this.attrs.dx = 0;
@@ -81,8 +83,6 @@
     this.m = new L.Matrix(); // transformation matrix
     this.t = []; // tansformations
     this.bbox = {x: Infinity, y: Infinity, w: 0, h: 0}; // bbox
-
-    options = options || {};
 
     if (options.back) {
       this.l.elements.unshift(this);
@@ -98,6 +98,7 @@
 
   E.init = L.init;
 
+  // Element API
   E.fn = {
     constructor: E,
     attr: function (args, options) {
