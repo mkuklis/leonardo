@@ -1,66 +1,65 @@
 (function (L) {
+
   // path commands
   var pathCommands = {
         // move
         M: function (v) {
           this.ctx.moveTo(v[0], v[1]);
           this.updateBbox({x: v[0], y: v[1]});
-        },
+        }
         // line
-        L: function (v) {
+      , L: function (v) {
           for (var i = 0, l = v.length; i < l; i += 2) {
             this.ctx.lineTo(v[i], v[i + 1]);
             this.updateBbox({x: v[i], y: v[i + 1]});
           }
-        },
+        }
         // vertical line
-        V: function (v) {
-          this.ctx.lineTo(this.bbox.x, v);
-        },
+      , V: function (v) { this.ctx.lineTo(this.bbox.x, v); }
         // horizontal line
-        H: function (v) {
-          this.ctx.lineTo(v, this.bbox.y);
-        },
+      , H: function (v) { this.ctx.lineTo(v, this.bbox.y); }
         // quadratric curves
-        Q: function (v) {
+      , Q: function (v) {
           for (var i = 0, l = v.length; i < l; i += 4) {
             this.ctx.quadraticCurveTo(v[i], v[i + 1], v[i + 2], v[i + 3]);
             this.updateBbox({x: v[i + 2], y: v[i + 3]});
           }
-        },
+        }
         // bezier curves
-        B: function (v) {
+      , B: function (v) {
           for (var i = 0, l = v.length; i < l; i += 6) {
             this.ctx.bezierCurveTo(v[i], v[i + 1], v[i + 2], v[i + 3], v[i + 4], v[i + 5]);
             this.updateBbox({x: v[i + 4], y: v[i + 5]});
           }
         }
       }
-      // transformation commands execute in the context of the element
-    , transCommands = {
+
+    // transformation commands execute in the context of the element
+     , transCommands = {
         rotate: function (t) {
           this.m.rotate(t.angle);
           this.ctx.rotate(t.angle * Math.PI / 180);
-        },
-        scale: function (t) {
+        }
+      , scale: function (t) {
           this.m.scale(t.sx, t.sy);
           this.ctx.scale(t.sx, t.sy);
         }
       }
+
     // draw commands which execute in the context of the element
     , drawCommmands = {
         circle: function (a) {
           this.ctx.arc(a.tx, a.ty, a.r, 0, Math.PI * 2, true);
           this.updateBbox({x: a.tx - a.r, y: a.ty - a.r, w: 2 * a.r, h: 2 * a.r});
-        },
-        rect: function (a) {
+        }
+      , rect: function (a) {
           this.ctx.rect(a.tx, a.ty, a.w, a.h);
           this.updateBbox({x: a.tx, y: a.ty, w: a.w, h: a.h});
-        },
-        path: function () {
+        }
+      , path: function () {
           this.attrs.path.forEach(this.processPath, this);
-        },
-        image: function (a) {
+        }
+      , image: function (a) {
           this.processImage();
           this.updateBbox({x: a.x, y: a.y, w: a.w, h: a.h});
         }
@@ -82,7 +81,8 @@
     this.m = new L.Matrix(); // transformation matrix
     this.t = []; // tansformations
     this.bbox = {x: Infinity, y: Infinity, w: 0, h: 0}; // bbox
-    var options = options || {};
+
+    options = options || {};
 
     if (options.back) {
       this.l.elements.unshift(this);
@@ -114,9 +114,9 @@
         return result;
       }
 
-      var options = options || {};
+      options = options || {};
 
-      for (key in args) {
+      for (var key in args) {
         this.attrs[key] = args[key];
       }
 
@@ -251,7 +251,7 @@
     },
 
     processPath: function (p) {
-      for (c in p) {
+      for (var c in p) {
         pathCommands[c].call(this, p[c]);
       }
     },
@@ -259,7 +259,7 @@
     rotate: function (angle, cx, cy) {
       var a = this.attrs;
 
-      if (cx == undefined) {
+      if (typeof cx == "undefined") {
         cx = a.w/2;
         cy = a.h/2;
       }
@@ -310,10 +310,10 @@
         this.bbox = a;
       }
       else if (a.x && a.y) {
-        if (a.x < b.x) b.x = a.x;
-        if (a.x > b.x + b.w) b.w = a.x - b.x;
-        if (a.y < b.y) b.y = a.y;
-        if (a.y > b.y + b.h) b.h = a.y - b.y;
+        if (a.x < b.x) { b.x = a.x; }
+        if (a.x > b.x + b.w) { b.w = a.x - b.x; }
+        if (a.y < b.y) { b.y = a.y; }
+        if (a.y > b.y + b.h) { b.h = a.y - b.y; }
       }
     },
 

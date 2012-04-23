@@ -15,12 +15,12 @@
       }
       this.animate();
     }, this));
-  }
+  };
 
   // returns current time
   L.now = function () {
     return (Date.now) ? Date.now() : new Date().getTime();
-  }
+  };
 
   L.init(function () {
     // # of fx elements
@@ -104,8 +104,8 @@
     },
     "Object": function (opts) {
       this.duration = opts.duration;
-      this.easing = opts.easing,
-      this.endFn = opts.end,
+      this.easing = opts.easing;
+      this.endFn = opts.end;
       this.stepFn = opts.step;
     }
   };
@@ -130,11 +130,11 @@
 
   L.Animation.prototype = {
     start: function () {
-      var st, ev, convert
+      var st, ev, convert;
 
       this.tweens = [];
 
-      for (attr in this.attrs) {
+      for (var attr in this.attrs) {
         convert = from[attr];
 
         if (convert) {

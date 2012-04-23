@@ -10,7 +10,7 @@
     }
 
     function off(event) {
-      if (!(event in events)) return;
+      if (!(event in events)) { return; }
       events[event].splice(events[event].indexOf(this), 1);
     }
 
@@ -29,7 +29,7 @@
 
     function trigger(event) {
       var args, bindings;
-      if (!(event in events)) return;
+      if (!(event in events)) { return; }
 
       args = slice.call(arguments, 1);
       bindings = events[event];

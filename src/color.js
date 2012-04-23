@@ -7,7 +7,7 @@
 
     // hex to rgb
     h2rgb: function (hex) {
-      var hex = (hex[0] == "#") ? hex.substr(1) : hex;
+      hex = (hex[0] == "#") ? hex.substr(1) : hex;
 
       if (hex.length == 3) {
         var temp = this.singleHexRegex.exec(hex).slice(1);
@@ -43,10 +43,12 @@
     },
 
     rgb2rgba: function (rgb, opacity) {
-      var rgb = this.rgbRegex.exec(color);
+      rgb = this.rgbRegex.exec(color);
+
       if (rgb && rgb.length == 4) {
         return "rgba(" + rgb[1] + ", " + rgb[2] + ", " + rgb[3] + ", " + opacity + ")";
       }
+
       return rgb;
     },
 
@@ -84,7 +86,9 @@
 
     d2h: function (n) {
       n = parseInt(n, 10);
-      if (isNaN(n)) return "00";
+      if (isNaN(n)) {
+        return "00";
+      }
       n = Math.max(0, Math.min(n, 255));
       return "0123456789ABCDEF".charAt((n - n % 16) / 16) + "0123456789ABCDEF".charAt(n % 16);
     },

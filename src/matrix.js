@@ -31,7 +31,7 @@
     },
 
     scale: function (x, y, cx, cy) {
-      y == null && (y = x);
+      y === null && (y = x);
       (cx || cy) && this.add(1, 0, 0, 1, cx, cy);
       this.add(x, 0, 0, y, 0, 0);
       (cx || cy) && this.add(1, 0, 0, 1, -cx, -cy);

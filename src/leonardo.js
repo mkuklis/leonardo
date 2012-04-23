@@ -53,12 +53,14 @@
     },
 
     path: function (attrs, options) {
+      var path;
+
       if (L.is('Array', attrs)) {
-        var attrs = {path: attrs};
+        attrs = {path: attrs};
       }
 
-      var options = options || {}
-        , path = L.E('path', attrs, this, options);
+      options = options || {};
+      path = L.E('path', attrs, this, options);
 
       if (!options.silent) {
         path.draw();
@@ -114,8 +116,8 @@
 
     getPxColor: function (x, y) {
       var px = this.getPx(x, y);
-      if (px[0] == 0 && px[1] == 0 && px[2] == 0) {
-        return (px[3] == 0) ? "#ffffff" : "#000000";
+      if (px[0] === 0 && px[1] === 0 && px[2] === 0) {
+        return (px[3] === 0) ? "#ffffff" : "#000000";
       }
 
       return "#" + L.C.rgbToHex(px[0], px[1], px[2]);
@@ -160,7 +162,7 @@
   L.extend = function(obj) {
     [].slice.call(arguments, 1).forEach(function(source) {
       for (var prop in source) {
-        if (source[prop] !== void 0) obj[prop] = source[prop];
+        if (source[prop] !== void 0) { obj[prop] = source[prop]; }
       }
     });
     return obj;

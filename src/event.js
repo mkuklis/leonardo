@@ -1,14 +1,14 @@
 (function (L) {
-  var E = L.E,
-      events = "mouseover mouseout mousedown mouseup click".split(" "),
-      cevents = "mousedown mouseup mousemove click".split(" "),
-      emap = {
-        "mouseover": "mousemove",
-        "mouseout": "mousemove",
-        "dragmove": "mousemove",
-        "dragstart": "mousedown",
-        "dragend": "mouseup"
-      };
+  var E = L.E
+    , events = "mouseover mouseout mousedown mouseup click".split(" ")
+    , cevents = "mousedown mouseup mousemove click".split(" ")
+    , emap = {
+        "mouseover": "mousemove"
+      , "mouseout": "mousemove"
+      , "dragmove": "mousemove"
+      , "dragstart": "mousedown"
+      , "dragend": "mouseup"
+    };
 
   // canvas event handlers
   var handlers = {
@@ -104,9 +104,9 @@
     else {
       poly = el.coords;
       for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i) {
-        ((poly[i][1] <= pt.y && pt.y < poly[j][1]) || (poly[j][1] <= pt.y && pt.y < poly[i][1]))
-        && (pt.x < (poly[j][0] - poly[i][0]) * (pt.y - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0])
-        && (c = !c);
+        ((poly[i][1] <= pt.y && pt.y < poly[j][1]) || (poly[j][1] <= pt.y && pt.y < poly[i][1])) &&
+          (pt.x < (poly[j][0] - poly[i][0]) * (pt.y - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0]) &&
+          (c = !c);
       }
 
       return c;
@@ -123,15 +123,17 @@
     }
   }
 
+  var setupListener = function (event) {
+    this.canvas.addEventListener(event, L.proxy(function (e) {
+      this.ev.trigger(event, getPos(e));
+      e.preventDefault();
+    }, this));
+  }
+
   L.init(function () {
     this.flags = {};
     for (var i = 0, l = cevents.length; i < l; i++) {
-      (L.proxy(function (event) {
-        this.canvas.addEventListener(event, L.proxy(function (e) {
-          this.ev.trigger(event, getPos(e));
-          e.preventDefault();
-        }, this));
-      }, this))(cevents[i]);
+      (L.proxy(setupListener, this))(cevents[i]);
     }
   });
 
@@ -162,7 +164,7 @@
       this.callbacks[event].push(fn);
     }
     return this;
-  },
+  }
 
   E.fn.off = function (event, fn) {
     if (this.callbacks[event]) {
