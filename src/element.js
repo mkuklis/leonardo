@@ -36,11 +36,11 @@
 
     // transformation commands execute in the context of the element
      , transCommands = {
-        rotate: function (t) {
+        r: function (t) {
           this.m.rotate(t.angle);
           this.ctx.rotate(t.angle * Math.PI / 180);
         }
-      , scale: function (t) {
+      , s: function (t) {
           this.m.scale(t.sx, t.sy);
           this.ctx.scale(t.sx, t.sy);
         }
@@ -81,7 +81,7 @@
     this.l = leonardo;
     this.ctx = this.l.ctx;
     this.m = new L.Matrix(); // transformation matrix
-    this.t = []; // tansformations
+    this.trans = {}; // tansformations
     this.bbox = {x: Infinity, y: Infinity, w: 0, h: 0}; // bbox
 
     if (options.back) {
@@ -115,15 +115,8 @@
         return result;
       }
 
-      options = options || {};
-
       for (var key in args) {
         this.attrs[key] = args[key];
-      }
-
-      if (!options.silent) {
-        // redraw all elements
-        this.redraw();
       }
 
       return this;
@@ -135,7 +128,6 @@
 
     draw: function () {
       var a = this.attrs;
-
       this.ctx.save();
       this.ctx.beginPath();
 
@@ -147,7 +139,7 @@
       this.ctx.strokeStyle = L.C.toColor(a.stroke, a['stroke-opacity']);
       this.ctx.lineWidth = a['stroke-width'] || 1.0;
 
-      if (this.t.length) {
+      if (this.trans) {
         this.transform();
       }
 
@@ -257,10 +249,11 @@
       }
     },
 
-    rotate: function (angle, cx, cy) {
-      var a = this.attrs;
+    rotate: function (angle, options) {
+      var a = this.attrs, cx, cy
+        , o = options || {};
 
-      if (typeof cx == "undefined") {
+      if (typeof o.cx == "undefined") {
         cx = a.w/2;
         cy = a.h/2;
       }
@@ -270,8 +263,8 @@
       a.tx = -cx;
       a.ty = -cy;
 
-      this.t.push({c: 'rotate', angle: angle, cx: cx, cy: cy});
-      this.redraw();
+      this.trans.r = { angle: angle, cx: cx, cy: cy };
+
       return this;
     },
 
@@ -288,8 +281,7 @@
       a.tx = -cx;
       a.ty = -cy;
 
-      this.t.push({ c:"scale", sx: sx, sy: sy, cx: cx, cy: cy });
-      this.redraw();
+      this.trans.s = { sx: sx, sy: sy, cx: cx, cy: cy };
       return this;
     },
 
@@ -299,9 +291,9 @@
       this.m.translate(a.x + a.cx, a.y + a.cy);
       this.ctx.translate(a.x + a.cx, a.y + a.cy);
 
-      this.t.forEach(function (t) {
-        transCommands[t.c].call(this, t);
-      }, this);
+      for (key in this.trans) {
+        transCommands[key].call(this, this.trans[key]);
+      }
     },
 
     updateBbox: function (a) {
@@ -325,7 +317,7 @@
     updateCoords: function () {
       var a = this.attrs;
       // transformation present
-      if (this.t.length) {
+      if (this.trans.r) {
         this.coords = [[a.tx, a.ty], [a.tx + a.w, a.ty],
           [a.tx + a.w, a.ty + a.h], [a.tx, a.ty + a.h]];
 

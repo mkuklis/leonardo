@@ -7,57 +7,27 @@
     <script src="../../src/matrix.js"></script>
     <script src="../../src/color.js"></script>
     <script src="../../src/element.js"></script>
-    <script src="../..src/pubsub.js"></script>
+    <script src="../../src/pubsub.js"></script>
     <script src="../../src/event.js"></script>
     <script src="../../src/polyfill.js"></script>
     <script src="../../src/easings.js"></script>
-    <script src="../..src/animation.js"></script>
+    <script src="../../src/animation.js"></script>
 
-  <script>
+    <script>
 
-    function getRandomNum(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-    window.onload = function() {
-      var leo = new Leonardo(0, 0, 500, 500);
-      var startTime = new Date();
-      for (var i = 1000; i--; ) {
-        leo.circle(
-          getRandomNum(0, 500),
-          getRandomNum(0, 500),
-          20, {fill: '#ff0000', stroke: '0000ff'}, {silent: true}).drag();
+      function getRandomNum(min, max) {
+        return Math.random() * (max - min) + min;
       }
-      leo.redraw();
-      var et = new Date();
-      //canvas.renderAll();
-      document.getElementById('logEl').innerHTML = 'leo: <b class="bench">' + (et - startTime) + '</b> ms';
-    }
 
-    /*
-    var shapes = ["rect", "circle"], els = [];
-
-    for (var i = 0; i < 100; i++) {
-      var shape = shapes[Math.floor(Math.random() * 2)];
-      var x = Math.floor(Math.random() * 1100);
-      var y = Math.floor(Math.random() * 700);
-      var w = Math.floor(Math.random() * 100);
-      var h = Math.floor(Math.random() * 100);
-      var color = '#' + ('00000' + (Math.random()*(1<<24)|0).toString(16)).slice(-6);
-      var el = leo[shape](x, y, w, h);
-      el.attr({fill: color});
-      els.push(el);
-    }
-
-    setInterval(function () {
-      for (var i = 0; i < 100; i++) {
-        var nx = Math.floor(Math.random() * 1100);
-        var ny = Math.floor(Math.random() * 700);
-        var color = '#'+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6);
-        console.log(color);
-        els[i].animate({x: nx, y: ny, fill: color}, 1000);
+      window.onload = function () {
+        var leo = new Leonardo(0, 0, 500, 500);
+        var rect = leo.rect(100, 100, 100, 100, 0, {fill: '#ff0000'});
+        var angle = 2;
+        setInterval(function () {
+          rect.rotate(angle).redraw();
+          angle += 2;
+        }, 1000);
       }
-    }, 1000);
-    */
-  </script>
+    </script>
   </body>
 </html>

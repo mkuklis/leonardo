@@ -16,11 +16,11 @@
   L.debug = false;
 
   L.init = function (fn) {
-    if (fn) { // called from plugin ..
+    if (fn) {
       this.inits = this.inits || [];
       this.inits.push(fn);
     }
-    else { // called from constructor
+    else {
       var ctr = this.constructor;
       ctr.inits && ctr.inits.forEach(function (fnc) {
         fnc.call(this);
@@ -32,39 +32,28 @@
   L.fn = {
     constructor: L,
     // create circle element
-    circle: function (x, y, r, attrs, options) {
+    circle: function (x, y, r, attrs) {
       var pos = { x: x || 0, y: y || 0, r: r || 0 }
         , circle = L.E('circle', L.extend(pos, attrs), this);
-      options = options || {};
-
-      if (!options.silent) {
-        circle.draw();
-      }
 
       return circle;
     },
 
     // create rect element
     rect: function (x, y, w, h, r, attrs) {
-      var pos = {x: x || 0, y: y || 0, w: w || 0, h: h || 0, r: r || 0}
+      var pos = { x: x || 0, y: y || 0, w: w || 0, h: h || 0, r: r || 0 }
         , rect = L.E('rect', L.extend(pos, attrs), this);
-      rect.draw();
       return rect;
     },
 
-    path: function (attrs, options) {
+    path: function (attrs) {
       var path;
 
       if (L.is('Array', attrs)) {
         attrs = {path: attrs};
       }
 
-      options = options || {};
       path = L.E('path', attrs, this, options);
-
-      if (!options.silent) {
-        path.draw();
-      }
 
       return path;
     },
@@ -73,7 +62,6 @@
     image: function (src, x, y, w, h, attrs) {
       var pos = {src: src, x: x || 0, y: y || 0, w: w || 0, h: h || 0}
         , image = L.E('image', L.extend(pos, attrs), this);
-      image.draw();
 
       return image;
     },
