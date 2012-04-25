@@ -1,7 +1,7 @@
 (function (L) {
 
-  // pub/sub module
-  L.ev = (function (slice) {
+  // emitter
+  L.em = (function (slice) {
     var events = []; //shared by element and leo
 
     function on(event, fn, ctx) {

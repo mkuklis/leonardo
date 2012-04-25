@@ -125,7 +125,7 @@
 
   var setupListener = function (event) {
     this.canvas.addEventListener(event, L.proxy(function (e) {
-      this.ev.trigger(event, getPos(e));
+      this.em.trigger(event, getPos(e));
       e.preventDefault();
     }, this));
   }
@@ -176,7 +176,7 @@
         delete this.callbacks[event];
       }
 
-      this.ev.off(emap[event] || event);
+      this.em.off(emap[event] || event);
     }
 
     return this;
@@ -223,7 +223,7 @@
   }
   */
 
-  L.ev.call(L.prototype);
-  L.ev.call(L.E.prototype);
+  L.em.call(L.prototype);
+  L.em.call(L.E.prototype);
 
 })(Leonardo);

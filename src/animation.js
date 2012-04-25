@@ -25,11 +25,11 @@
   L.init(function () {
     // # of fx elements
     this.fxcounter = 0;
-    this.ev.on('fx:add', function () {
+    this.em.on('fx:add', function () {
       this.fxcounter += 1;
     }, this);
 
-    this.ev.on('fx:remove', function () {
+    this.em.on('fx:remove', function () {
       this.fxcounter -= 1;
     }, this);
 
