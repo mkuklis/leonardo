@@ -49,12 +49,12 @@
   E.fn.rotate = function (angle, cx, cy) {
     this.transform({r: [angle, cx, cy]});
     return this;
-  },
+  }
 
   E.fn.scale = function (sx, sy, cx, cy) {
     this.transform({s: [sx, sy, cx, cy]});
     return this;
-  },
+  }
 
   /**
    * Transforms element
@@ -65,7 +65,7 @@
    * {r:[90,0,0],s:[10,10,0,0],R:[90, 0,0]}
    */
   E.fn.transform = function (attrs) {
-    for (key in attrs) {
+    for (var key in attrs) {
       if (attrs.hasOwnProperty(key)) {
         transCommands[key].apply(this, attrs[key]);
       }
@@ -78,7 +78,7 @@
     this.m.translate(a.x + a.cx, a.y + a.cy);
     this.ctx.translate(a.x + a.cx, a.y + a.cy);
 
-    for (key in this.trans) {
+    for (var key in this.trans) {
       if (this.trans.hasOwnProperty(key)) {
         ctxCommands[key].call(this, this.trans[key]);
       }

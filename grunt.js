@@ -14,7 +14,7 @@ module.exports = function (grunt) {
           'src/easings.js',
           'src/animation.js'
         ],
-        dest: 'dist/leonardo.min.js'
+        dest: 'leonardo.min.js'
       }
     },
     jshint: {
