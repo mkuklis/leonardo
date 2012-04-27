@@ -41,7 +41,7 @@
     }
 
     return function () {
-      this.ev = {
+      this.em = {
         on: on,
         off: off,
         reorder: reorder,

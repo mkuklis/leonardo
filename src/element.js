@@ -62,15 +62,23 @@
 
     options = options || {};
 
+    attrs.tx = attrs.x;
+    attrs.ty = attrs.y;
+    attrs.dx = 0;
+    attrs.dy = 0;
+
+    this.id = L.uuid();
     this.type = type;
     this.attrs = attrs;
-    this.attrs.dx = 0;
-    this.attrs.dy = 0;
     this.l = leonardo;
     this.ctx = this.l.ctx;
     // this.m = new L.Matrix(); // transformation matrix
     // this.trans = {}; // tansformations
-    this.bbox = {x: Infinity, y: Infinity, w: 0, h: 0}; // bbox
+    // bbox
+    this.bbox = {x: Infinity, y: Infinity, w: 0, h: 0};
+
+    // set of draw callbacks
+    this.drawCallbacks = [];
 
     if (options.back) {
       this.l.elements.unshift(this);
@@ -79,8 +87,8 @@
       this.l.elements.push(this);
     }
 
-    this.updateCoords();
-    this.id = L.uuid();
+    //this.updateCoords();
+
     E.init.call(this);
   }
 
@@ -127,13 +135,11 @@
       this.ctx.strokeStyle = L.C.toColor(a.stroke, a['stroke-opacity']);
       this.ctx.lineWidth = a['stroke-width'] || 1.0;
 
-      /*
       if (this.trans) {
-        this.transform();
+        this.processTransform();
       }
 
       this.updateCoords();
-      */
 
       if (drawCommmands[this.type]) {
         drawCommmands[this.type].call(this, a);
@@ -157,6 +163,31 @@
 
       this.ctx.closePath();
       this.ctx.restore();
+    },
+
+    updateCoords: function () {
+      var a = this.attrs;
+      // transformation present
+      if (this.trans && this.trans.r) {
+        this.coords = [[a.tx, a.ty], [a.tx + a.w, a.ty],
+          [a.tx + a.w, a.ty + a.h], [a.tx, a.ty + a.h]];
+
+        for (var i = 0, l = this.coords.length; i < l; i++) {
+          var c = this.coords[i];
+          this.coords[i] = this.m.xy(c[0], c[1]);
+        }
+      }
+      else {
+        var x = a.x
+          , y = a.y
+          , w = a.w
+          , h = a.h;
+
+        a.tx = x;
+        a.ty = y;
+
+        this.coords = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
+      }
     },
 
     createStyle: function () {
