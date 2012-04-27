@@ -26,7 +26,8 @@
 
         var angle = 2;
         setInterval(function () {
-          rect.rotate(angle).redraw();
+          rect.transform({r:[angle],s:[2,2]}).redraw();
+          //rect.rotate(angle).redraw();
           angle += 2;
         }, 100);
 

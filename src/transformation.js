@@ -70,6 +70,8 @@
         transCommands[key].apply(this, attrs[key]);
       }
     }
+
+    return this;
   }
 
   E.fn.processTransform = function () {
