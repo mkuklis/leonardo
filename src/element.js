@@ -163,6 +163,8 @@
 
       this.ctx.closePath();
       this.ctx.restore();
+
+      return this;
     },
 
     updateCoords: function () {

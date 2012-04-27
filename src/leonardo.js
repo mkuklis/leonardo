@@ -4,11 +4,16 @@
   var w = this
     , d = w.document;
 
-  this.Leonardo = function () {
-    this.canvas = L.createCanvas.apply(this, arguments);
+  this.Leonardo = function (args) {
+    var args = args || arguments;
+    this.canvas = L.createCanvas.apply(this, args);
     this.ctx = this.canvas.getContext("2d");
     this.elements = [];
     L.init.call(this);
+  }
+
+  this.leo = function () {
+    return new Leonardo(arguments);
   }
 
   var L = Leonardo;

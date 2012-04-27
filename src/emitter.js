@@ -14,14 +14,18 @@
       events[event].splice(events[event].indexOf(this), 1);
     }
 
-    function reorder(event) {
-      var els = events[event],
-          index = els.indexOf(this);
+    function reorder(event, ctx) {
+      var bindings = events[event], fn, binding;
 
-      if (index < els.length - 1) {
-        els.splice(index, 1);
-        els.push(this);
-        return index;
+      for (var i = 0, l = bindings.length; i < l; i++) {
+        binding = bindings[i];
+        if (ctx == binding.ctx) {
+          fn = binding.fn;
+          bindings.splice(i, 1);
+          bindings.push({fn: fn, ctx: ctx});
+
+          return i;
+        }
       }
 
       return -1;

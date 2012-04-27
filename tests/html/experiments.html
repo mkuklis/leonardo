@@ -20,16 +20,27 @@
       }
 
       window.onload = function () {
-        var leo = new Leonardo(0, 0, 500, 500);
-        var rect = leo.rect(100, 100, 100, 100, 0, {fill: '#ff0000'});
-        rect.draw();
+        var paper = leo(0, 0, 500, 500);
+        var rect1 = paper.rect(100, 100, 100, 100, 0, {fill: '#ff0000'});
+        var rect2 = paper.rect(100, 100, 100, 100, 0, {fill: '#00ff00'});
 
-        var angle = 2;
+        rect1.draw().drag();
+        rect2.draw().drag();
+
+        var angle = 2, angle2 = -2;
         setInterval(function () {
-          rect.transform({r:[angle],s:[2,2]}).redraw();
+          rect1.transform({r:[angle],s:[2,2]}).redraw();
           //rect.rotate(angle).redraw();
-          angle += 2;
+          angle += 5;
         }, 100);
+
+
+        setInterval(function () {
+          rect2.transform({r:[angle2],s:[1,1]});
+          //rect.rotate(angle).redraw();
+          angle2 -= 10;
+        }, 500);
+
 
       }
     </script>

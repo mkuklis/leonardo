@@ -158,7 +158,7 @@
 
   E.fn.on = function (event, fn) {
     this.callbacks[event] = this.callbacks[event] || [];
-    this.ev.on(emap[event] || event, handlers[emap[event]]);
+    this.em.on(emap[event] || event, handlers[emap[event]], this);
 
     if (fn) {
       this.callbacks[event].push(fn);
@@ -205,7 +205,7 @@
 
   E.fn.toFront = function () {
     this.l.toFront(this);
-    var index = this.reorder('mousedown');
+    var index = this.em.reorder('mousedown', this);
     if (index > -1) {
       this.l.flags.mouseover = index;
       this.redraw();
