@@ -4,15 +4,15 @@ module.exports = function (grunt) {
       dist: {
         src: [
           'src/leonardo.js',
-          'src/color.js',
           'src/matrix.js',
-          'src/transformation.js',
+          'src/color.js',
           'src/element.js',
           'src/emitter.js',
           'src/event.js',
           'src/polyfill.js',
           'src/easings.js',
-          'src/animation.js'
+          'src/animation.js',
+          'src/transformation.js'
         ],
         dest: 'leonardo.js'
       }
@@ -22,15 +22,15 @@ module.exports = function (grunt) {
       dist: {
         src: [
           'src/leonardo.js',
-          'src/color.js',
           'src/matrix.js',
-          'src/transformation.js',
+          'src/color.js',
           'src/element.js',
           'src/emitter.js',
           'src/event.js',
           'src/polyfill.js',
           'src/easings.js',
-          'src/animation.js'
+          'src/animation.js',
+          'src/transformation.js'
         ],
         dest: 'leonardo.min.js'
       }

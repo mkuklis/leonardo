@@ -4,11 +4,16 @@
   var w = this
     , d = w.document;
 
-  this.Leonardo = function () {
-    this.canvas = L.createCanvas.apply(this, arguments);
+  this.Leonardo = function (args) {
+    args = args || arguments;
+    this.canvas = L.createCanvas.apply(this, args);
     this.ctx = this.canvas.getContext("2d");
     this.elements = [];
     L.init.call(this);
+  }
+
+  this.leo = function () {
+    return new Leonardo(arguments);
   }
 
   var L = Leonardo;
@@ -193,6 +198,76 @@
 
 }).call(this);
 
+(function (L) {
+
+  function Matrix() {
+    this.reset();
+  }
+
+  Matrix.prototype =  {
+    reset: function () {
+      this.m = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+    },
+
+    add: function (a, b, c, d, e, f) {
+      var o = [[], [], []]
+        , m = [[a, c, e], [b, d, f], [0, 0, 1]]
+        , x, y, z, res;
+
+      for (x = 0; x < 3; x++) {
+        for (y = 0; y < 3; y++) {
+          res = 0;
+          for (z = 0; z < 3; z++) {
+            res += this.m[x][z] * m[z][y];
+          }
+          o[x][y] = res;
+        }
+      }
+      this.m = o;
+    },
+
+    translate: function (x, y) {
+      this.add(1, 0, 0, 1, x, y);
+    },
+
+    scale: function (x, y, cx, cy) {
+      y === null && (y = x);
+      (cx || cy) && this.add(1, 0, 0, 1, cx, cy);
+      this.add(x, 0, 0, y, 0, 0);
+      (cx || cy) && this.add(1, 0, 0, 1, -cx, -cy);
+    },
+
+    rotate: function (a, x, y) {
+      a = L.rad(a);
+      x = x || 0;
+      y = y || 0;
+      var cos = Math.cos(a).toFixed(9)
+        , sin = Math.sin(a).toFixed(9);
+      this.add(cos, sin, -sin, cos, x, y);
+      this.add(1, 0, 0, 1, -x, -y);
+    },
+
+    x: function (x, y) {
+      return x * this.m[0][0] + y * this.m[0][1] + this.m[0][2];
+    },
+
+    y: function (x, y) {
+      return x * this.m[1][0] + y * this.m[1][1] + this.m[1][2];
+    },
+
+    xy: function (x, y) {
+      return [this.x(x, y), this.y(x, y)];
+    }
+  }
+
+  L.matrix = function () {
+    return new Matrix();
+  };
+
+  L.Matrix = Matrix;
+
+})(Leonardo);
+
 // colors helpers
 (function (L) {
   L.C = {
@@ -293,169 +368,6 @@
       return [rgb.r, rgb.g, rgb.b];
     }
   };
-})(Leonardo);
-
-(function (L) {
-
-  function Matrix() {
-    this.reset();
-  }
-
-  Matrix.prototype =  {
-    reset: function () {
-      this.m = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
-    },
-
-    add: function (a, b, c, d, e, f) {
-      var o = [[], [], []]
-        , m = [[a, c, e], [b, d, f], [0, 0, 1]]
-        , x, y, z, res;
-
-      for (x = 0; x < 3; x++) {
-        for (y = 0; y < 3; y++) {
-          res = 0;
-          for (z = 0; z < 3; z++) {
-            res += this.m[x][z] * m[z][y];
-          }
-          o[x][y] = res;
-        }
-      }
-      this.m = o;
-    },
-
-    translate: function (x, y) {
-      this.add(1, 0, 0, 1, x, y);
-    },
-
-    scale: function (x, y, cx, cy) {
-      y === null && (y = x);
-      (cx || cy) && this.add(1, 0, 0, 1, cx, cy);
-      this.add(x, 0, 0, y, 0, 0);
-      (cx || cy) && this.add(1, 0, 0, 1, -cx, -cy);
-    },
-
-    rotate: function (a, x, y) {
-      a = L.rad(a);
-      x = x || 0;
-      y = y || 0;
-      var cos = Math.cos(a).toFixed(9)
-        , sin = Math.sin(a).toFixed(9);
-      this.add(cos, sin, -sin, cos, x, y);
-      this.add(1, 0, 0, 1, -x, -y);
-    },
-
-    x: function (x, y) {
-      return x * this.m[0][0] + y * this.m[0][1] + this.m[0][2];
-    },
-
-    y: function (x, y) {
-      return x * this.m[1][0] + y * this.m[1][1] + this.m[1][2];
-    },
-
-    xy: function (x, y) {
-      return [this.x(x, y), this.y(x, y)];
-    }
-  }
-
-  L.matrix = function () {
-    return new Matrix();
-  };
-
-  L.Matrix = Matrix;
-
-})(Leonardo);
-
-(function (L) {
-
-  // Element
-  var E = L.E;
-
-  function center(attrs, cx, cy) {
-    var a = attrs;
-
-    if (typeof cx == "undefined") {
-      cx = a.w/2;
-      cy = a.h/2;
-    }
-
-    a.cx = cx;
-    a.cy = cy;
-    a.tx = -cx;
-    a.ty = -cy;
-  }
-
-  // transformation commands
-  var transCommands = {
-    r: function (angle, cx, cy) {
-      var a = this.attrs;
-      this.trans = this.trans || {};
-      center(a, cx, cy);
-      this.trans.r = { angle: angle, cx: a.cx, cy: a.cy };
-    },
-    s: function (sx, sy, cx, cy) {
-      var a = this.attrs;
-      this.trans = this.trans || {};
-      center(a, cx, cy);
-      this.trans.s = { sx: sx, sy: sy, cx: a.cx, cy: a.cy };
-    }
-  }
-
-  // draw transformation commands
-  var ctxCommands = {
-    r: function (t) {
-      this.m.rotate(t.angle);
-      this.ctx.rotate(t.angle * Math.PI / 180);
-    },
-    s: function (t) {
-      this.m.scale(t.sx, t.sy);
-      this.ctx.scale(t.sx, t.sy);
-    }
-  };
-
-  // Element transformation API
-  E.fn.rotate = function (angle, cx, cy) {
-    this.transform({r: [angle, cx, cy]});
-    return this;
-  }
-
-  E.fn.scale = function (sx, sy, cx, cy) {
-    this.transform({s: [sx, sy, cx, cy]});
-    return this;
-  }
-
-  /**
-   * Transforms element
-   * attrs - represents transformation object
-   *
-   * format:
-   *
-   * {r:[90,0,0],s:[10,10,0,0],R:[90, 0,0]}
-   */
-  E.fn.transform = function (attrs) {
-    for (var key in attrs) {
-      if (attrs.hasOwnProperty(key)) {
-        transCommands[key].apply(this, attrs[key]);
-      }
-    }
-  }
-
-  E.fn.processTransform = function () {
-    var a = this.attrs;
-    this.m.reset();
-    this.m.translate(a.x + a.cx, a.y + a.cy);
-    this.ctx.translate(a.x + a.cx, a.y + a.cy);
-
-    for (var key in this.trans) {
-      if (this.trans.hasOwnProperty(key)) {
-        ctxCommands[key].call(this, this.trans[key]);
-      }
-    }
-  }
-
-  E.init(function () {
-    this.m = new L.Matrix(); // transformation matrix
-  });
-
 })(Leonardo);
 
 (function (L) {
@@ -623,6 +535,8 @@
 
       this.ctx.closePath();
       this.ctx.restore();
+
+      return this;
     },
 
     updateCoords: function () {
@@ -775,14 +689,18 @@
       events[event].splice(events[event].indexOf(this), 1);
     }
 
-    function reorder(event) {
-      var els = events[event],
-          index = els.indexOf(this);
+    function reorder(event, ctx) {
+      var bindings = events[event], fn, binding;
 
-      if (index < els.length - 1) {
-        els.splice(index, 1);
-        els.push(this);
-        return index;
+      for (var i = 0, l = bindings.length; i < l; i++) {
+        binding = bindings[i];
+        if (ctx == binding.ctx) {
+          fn = binding.fn;
+          bindings.splice(i, 1);
+          bindings.push({fn: fn, ctx: ctx});
+
+          return i;
+        }
       }
 
       return -1;
@@ -974,7 +892,7 @@
 
   E.fn.on = function (event, fn) {
     this.callbacks[event] = this.callbacks[event] || [];
-    this.ev.on(emap[event] || event, handlers[emap[event]]);
+    this.em.on(emap[event] || event, handlers[emap[event]], this);
 
     if (fn) {
       this.callbacks[event].push(fn);
@@ -1021,7 +939,7 @@
 
   E.fn.toFront = function () {
     this.l.toFront(this);
-    var index = this.reorder('mousedown');
+    var index = this.em.reorder('mousedown', this);
     if (index > -1) {
       this.l.flags.mouseover = index;
       this.redraw();
@@ -1509,4 +1427,99 @@
 
     return this;
   }
+})(Leonardo);
+
+(function (L) {
+
+  // Element
+  var E = L.E;
+
+  function center(attrs, cx, cy) {
+    var a = attrs;
+
+    if (typeof cx == "undefined") {
+      cx = a.w/2;
+      cy = a.h/2;
+    }
+
+    a.cx = cx;
+    a.cy = cy;
+    a.tx = -cx;
+    a.ty = -cy;
+  }
+
+  // transformation commands
+  var transCommands = {
+    r: function (angle, cx, cy) {
+      var a = this.attrs;
+      this.trans = this.trans || {};
+      center(a, cx, cy);
+      this.trans.r = { angle: angle, cx: a.cx, cy: a.cy };
+    },
+    s: function (sx, sy, cx, cy) {
+      var a = this.attrs;
+      this.trans = this.trans || {};
+      center(a, cx, cy);
+      this.trans.s = { sx: sx, sy: sy, cx: a.cx, cy: a.cy };
+    }
+  }
+
+  // draw transformation commands
+  var ctxCommands = {
+    r: function (t) {
+      this.m.rotate(t.angle);
+      this.ctx.rotate(t.angle * Math.PI / 180);
+    },
+    s: function (t) {
+      this.m.scale(t.sx, t.sy);
+      this.ctx.scale(t.sx, t.sy);
+    }
+  };
+
+  // Element transformation API
+  E.fn.rotate = function (angle, cx, cy) {
+    this.transform({r: [angle, cx, cy]});
+    return this;
+  }
+
+  E.fn.scale = function (sx, sy, cx, cy) {
+    this.transform({s: [sx, sy, cx, cy]});
+    return this;
+  }
+
+  /**
+   * Transforms element
+   * attrs - represents transformation object
+   *
+   * format:
+   *
+   * {r:[90,0,0],s:[10,10,0,0],R:[90, 0,0]}
+   */
+  E.fn.transform = function (attrs) {
+    for (var key in attrs) {
+      if (attrs.hasOwnProperty(key)) {
+        transCommands[key].apply(this, attrs[key]);
+      }
+    }
+
+    return this;
+  }
+
+  E.fn.processTransform = function () {
+    var a = this.attrs;
+    this.m.reset();
+    this.m.translate(a.x + a.cx, a.y + a.cy);
+    this.ctx.translate(a.x + a.cx, a.y + a.cy);
+
+    for (var key in this.trans) {
+      if (this.trans.hasOwnProperty(key)) {
+        ctxCommands[key].call(this, this.trans[key]);
+      }
+    }
+  }
+
+  E.init(function () {
+    this.m = new L.Matrix(); // transformation matrix
+  });
+
 })(Leonardo);

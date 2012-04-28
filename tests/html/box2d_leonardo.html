@@ -1,0 +1,76 @@
+<html>
+  <head></head>
+  <body>
+    <script src="../lib/Box2dWeb-2.1.a.3.min.js"></script>
+    <script src="../../leonardo.js"></script>
+    <script>
+      var b2Vec2 = Box2D.Common.Math.b2Vec2
+        , b2BodyDef    = Box2D.Dynamics.b2BodyDef
+        , b2Body       = Box2D.Dynamics.b2Body
+        , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
+        , b2Fixture    = Box2D.Dynamics.b2Fixture
+        , b2World      = Box2D.Dynamics.b2World
+        , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+        , b2CircleShape  = Box2D.Collision.Shapes.b2CircleShape
+        , b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+
+      var world = new b2World(new b2Vec2(0, 10), true)
+        , s = 30
+        , fixDef = new b2FixtureDef()
+        , bodyDef = new b2BodyDef();
+
+      var paper = leo(0, 0, 1200, 500);
+
+      fixDef.density = 1.0;
+      fixDef.friction = 0.5;
+      fixDef.restitution = 0.2;
+      bodyDef.position.Set(paper.canvas.width / 2 / s, paper.canvas.height / s);
+
+      // floor
+      fixDef.shape = new b2PolygonShape()
+      fixDef.shape.SetAsBox(paper.canvas.width / s / 2, (10 / s) / 2);
+      world.CreateBody(bodyDef).CreateFixture(fixDef);
+
+      var rect = paper.rect(0, paper.canvas.height - 5, paper.canvas.width, 5);
+      rect.attr({fill: "#00ff00"});
+
+      // objects
+      bodyDef.type = b2Body.b2_dynamicBody;
+      var body;
+
+      for (var i = 0; i < 15; i++) {
+          var r = Math.random() + 0.1
+            , x = Math.random() * 25
+            , y = Math.random() * 10
+            , w = Math.random() * 2
+            , h = Math.random() * 2;
+
+          bodyDef.position.Set(x, y);
+          fixDef.shape = new b2PolygonShape();
+          fixDef.shape.SetAsBox(w, h);
+
+          var rect = paper.rect(x*s - w*s, y*s - h*s, 2*s*w, 2*s*h);
+          body = world.CreateBody(bodyDef).CreateFixture(fixDef);
+          rect.attr({fill: "#00ff00", body: body});
+      }
+
+      function redraw(el) {
+        var body = el.attr('body');
+        if (body) {
+          var p = body.m_body.GetPosition();
+          el.attr({ x: p.x*s - el.attr('w')/2 , y: p.y*s - el.attr('h')/2 });
+          el.rotate(Leonardo.deg(body.m_body.GetAngle()));
+        }
+      }
+
+      function update() {
+        world.Step(1 / 60, 10, 10);
+        paper.redraw(redraw);
+        world.ClearForces();
+        requestAnimationFrame(update);
+      }
+
+      update();
+    </script>
+  </body>
+</html>

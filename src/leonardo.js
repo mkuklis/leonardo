@@ -5,7 +5,7 @@
     , d = w.document;
 
   this.Leonardo = function (args) {
-    var args = args || arguments;
+    args = args || arguments;
     this.canvas = L.createCanvas.apply(this, args);
     this.ctx = this.canvas.getContext("2d");
     this.elements = [];

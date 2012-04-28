@@ -6,14 +6,15 @@
     <script src="../../src/matrix.js"></script>
     <script src="../../src/color.js"></script>
     <script src="../../src/element.js"></script>
-    <script src="../../src/pubsub.js"></script>
+    <script src="../../src/emitter.js"></script>
     <script src="../../src/event.js"></script>
     <script src="../../src/polyfill.js"></script>
     <script src="../../src/easings.js"></script>
     <script src="../../src/animation.js"></script>
+    <script src="../../src/transformation.js"></script>
     <script>
 
-      var paper = new Leonardo(0, 0, 1200, 500);
+      var paper = leo(0, 0, 1200, 500);
 
       var b2Vec2 = Box2D.Common.Math.b2Vec2
 
@@ -24,7 +25,8 @@
         , b2World      = Box2D.Dynamics.b2World
 
         , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-        , b2CircleShape  = Box2D.Collision.Shapes.b2CircleShape;
+        , b2CircleShape  = Box2D.Collision.Shapes.b2CircleShape
+        , b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 
       var world = new b2World(new b2Vec2(0, 10), true)
         , SCALE = 30
@@ -44,9 +46,44 @@
       var rect = paper.rect(0, paper.canvas.height - 5, paper.canvas.width, 5);
       rect.attr({fill: "#00ff00"});
 
+
       // objects
       bodyDef.type = b2Body.b2_dynamicBody;
       var circles = [];
+
+      var x = 10, y = 10, w = 2, h = 2;
+      fixDef.shape = new b2PolygonShape();
+      fixDef.shape.SetAsBox(2, 2);
+      bodyDef.position.Set(x, y);
+
+      var circle1 = paper.rect(SCALE * x - 60, SCALE * y - 60, 120, 120, 0, {fill: "#00ff00"});
+      circles.push(circle1);
+      var body = world.CreateBody(bodyDef).CreateFixture(fixDef);
+      circle1.attr({body: body});
+
+      fixDef.shape = new b2PolygonShape();
+      fixDef.shape.SetAsBox(1, 1);
+      bodyDef.position.Set(12, 5);
+
+      var circle2 = paper.rect(360 - 30, 150 - 30, 60, 60, 0, {fill: "#00ff00"});
+      circles.push(circle2);
+      var body = world.CreateBody(bodyDef).CreateFixture(fixDef);
+      circle2.attr({body: body});
+
+    //setup debug draw
+     var debugDraw = new b2DebugDraw();
+       debugDraw.SetSprite(paper.ctx);
+       debugDraw.SetDrawScale(SCALE);
+       debugDraw.SetFillAlpha(0.3);
+       debugDraw.SetLineThickness(1.0);
+       debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+       world.SetDebugDraw(debugDraw);
+       world.DrawDebugData();
+
+      circle1.draw();
+      circle2.draw();
+
+      /*
       for (var i = 0; i < 5; i++) {
         var r = Math.random() + 0.1
           , x = Math.random() * 25
@@ -72,7 +109,9 @@
         //console.log(body);
         circle.attr({body: body});
        // circles.push(circle);
-      }
+     }
+*/
+
 
       var start = 0, counter = 0;
       setTimeout(function () {
@@ -85,24 +124,26 @@
 
           if (start == 1) {
             if (counter < 10) {
-              console.log(Leonardo.deg(body.m_body.GetAngle()));
+              //console.log(Leonardo.deg(body.m_body.GetAngle()));
               //console.log(el);
               counter += 1;
             }
           }
 
           if (el.type == "rect") {
-            el.rotate(body.m_body.GetAngle());
+            el.rotate(Leonardo.deg(body.m_body.GetAngle()));
           }
 
           var p = body.m_body.GetPosition();
-          el.attr({x: p.x * SCALE, y: p.y * SCALE});
+          el.attr({x: p.x * SCALE - el.attr('w') / 2 , y: p.y * SCALE - el.attr('h') / 2 });
         }
       }
 
       function update() {
         world.Step(1 / 60, 10, 10);
+        //world.DrawDebugData();
         paper.redraw(redraw);
+        //world.DrawDebugData();
         world.ClearForces();
         requestAnimationFrame(update);
       }
@@ -110,5 +151,9 @@
       update();
 
     </script>
+
+
   </body>
+
+
 </html>
