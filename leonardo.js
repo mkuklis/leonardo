@@ -1,8 +1,38 @@
+/*!
+ * Leonardo
+ * Copyright(c) 2012 Michal Kuklis <michal.kuklis@gmail.com>
+ * MIT Licensed
+ */
+
 (function () {
 
-  // global
+  // globals
   var w = this
     , d = w.document;
+
+  /**
+   * Initialize `Leonardo` for the given parameters.
+   *
+   * Canvas object will be created or referenced from DOM
+   * based on given paramenters.
+   *
+   * Parameter types:
+   *
+   * @param {String} container - DOM element or the ID of the canvas
+   *
+   * or:
+   *
+   * @param {Number} top
+   * @param {Number} left
+   * @param {Number} width
+   * @param {Number} height
+   *
+   * or:
+   *
+   * @param {Array} all - combination of parameters passed as Array
+   *
+   * @api public
+   */
 
   this.Leonardo = function () {
     var args = arguments,
@@ -14,6 +44,13 @@
     L.init.call(this);
   }
 
+  /**
+   * Initialize `Leonardo` for the given parameters.
+   * Shortcut for `Leonardo` constructor to avoid typing `new`
+   *
+   * @api public
+   */
+
   this.leonardo = function () {
     return new Leonardo(arguments);
   }
@@ -21,6 +58,15 @@
   var L = Leonardo;
   L.version = 0.1;
   L.debug = false;
+
+  /**
+   * Register callback executed during constructor
+   * initialization. Used by `Leonardo` and `Element`.
+   *
+   * @param {Function} fn
+   *
+   * @api private
+   */
 
   L.init = function (fn) {
     if (fn) {
@@ -38,7 +84,20 @@
   // leonardo API
   L.fn = {
     constructor: L,
-    // create circle element
+
+    /**
+     * Create circle element.
+     *
+     * @param {Number} x - x coordinate of the centre
+     * @param {Number} y - y coordinate of the centre
+     * @param {Number} r - radius
+     *
+     * @param {Object} attrs - additional attributes
+     * described by `Element.attr`
+     *
+     * @api public
+     */
+
     circle: function (x, y, r, attrs) {
       var pos = { x: x || 0, y: y || 0, r: r || 0 }
         , circle = L.E('circle', L.extend(pos, attrs), this);
@@ -46,12 +105,34 @@
       return circle;
     },
 
-    // create rect element
+    /**
+     * Create rectangle element.
+     *
+     * @param {Number} x - x coordinate of the top left corner
+     * @param {Number} y - y coordinate of the top left corner
+     * @param {Number} w - width
+     * @param {Number} h - height
+     * @param {Number} r - radius for rounded corners, default is 0
+     *
+     * @param {Object} attrs - additional attributes
+     * described by `Element.attr`
+     *
+     * @api public
+     */
+
     rect: function (x, y, w, h, r, attrs) {
       var pos = { x: x || 0, y: y || 0, w: w || 0, h: h || 0, r: r || 0 }
         , rect = L.E('rect', L.extend(pos, attrs), this);
       return rect;
     },
+
+    /**
+     * Create path.
+     *
+     * @param {Object} attrs
+     *
+     * @api public
+     */
 
     path: function (attrs) {
       var path;
