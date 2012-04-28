@@ -24,34 +24,37 @@
       fixDef.density = 1.0;
       fixDef.friction = 0.5;
       fixDef.restitution = 0.2;
-      bodyDef.position.Set(paper.canvas.width / 2 / s, paper.canvas.height / s);
 
-      // floor
+      // floor physics
+      bodyDef.position.Set(paper.canvas.width /2/s, paper.canvas.height/s);
       fixDef.shape = new b2PolygonShape()
       fixDef.shape.SetAsBox(paper.canvas.width / s / 2, (10 / s) / 2);
       world.CreateBody(bodyDef).CreateFixture(fixDef);
 
+      // floor ui
       var rect = paper.rect(0, paper.canvas.height - 5, paper.canvas.width, 5);
       rect.attr({fill: "#00ff00"});
 
-      // objects
+      var body, rect;
       bodyDef.type = b2Body.b2_dynamicBody;
-      var body;
 
       for (var i = 0; i < 15; i++) {
-          var r = Math.random() + 0.1
-            , x = Math.random() * 25
-            , y = Math.random() * 10
-            , w = Math.random() * 2
-            , h = Math.random() * 2;
+        var r = Math.random() + 0.1
+          , x = Math.random() * 25
+          , y = Math.random() * 10
+          , w = Math.random() * 2
+          , h = Math.random() * 2;
 
-          bodyDef.position.Set(x, y);
-          fixDef.shape = new b2PolygonShape();
-          fixDef.shape.SetAsBox(w, h);
+        // rect physics
+        bodyDef.position.Set(x, y);
+        fixDef.shape = new b2PolygonShape();
+        fixDef.shape.SetAsBox(w, h);
+        body = world.CreateBody(bodyDef).CreateFixture(fixDef);
 
-          var rect = paper.rect(x*s - w*s, y*s - h*s, 2*s*w, 2*s*h);
-          body = world.CreateBody(bodyDef).CreateFixture(fixDef);
-          rect.attr({fill: "#00ff00", body: body});
+        var color = '#' + ('00000' + (Math.random()*(1<<24)|0).toString(16)).slice(-6);
+        // rect ui
+        rect = paper.rect(x*s - w*s, y*s - h*s, 2*s*w, 2*s*h);
+        rect.attr({fill: color, body: body});
       }
 
       function redraw(el) {
