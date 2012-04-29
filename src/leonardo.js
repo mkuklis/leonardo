@@ -8,7 +8,8 @@
 
   // globals
   var w = this
-    , d = w.document;
+    , d = w.document
+    , slice = Array.prototype.slice;
 
   /**
    * Initialize `Leonardo` for the given parameters.
@@ -127,26 +128,54 @@
     },
 
     /**
-     * Create path.
+     * Create path element.
+     * Path can be used to draw lines, polygons and curves.
+     * Command argument represents single path command or multiple
+     * commands passed as {Array}.
      *
-     * @param {Object} attrs
+     * Commands:
+     *
+     *  {M: [x, y]} - move to point with x, y coordinates
+     *  {L: [x, y]} - draw line to x, y
+     *  {V: x}      - draw vertical line to x
+     *  {H: y}      - draw horizontal line
+     *  {Q: [cp1x, cp1y, x1, y1, cp2x, cp2y, x2, y2, ...]} - draw quadratric curve
+     *  {B: [cp1x, cp1y, cp2x, cp2y, x, y, ....]} - draw bezier curve
+     *
+     * @param {Object} command
+     *
+     * or
+     *
+     * @param {Array} command
      *
      * @api public
      */
 
-    path: function (attrs) {
+    path: function (command) {
       var path;
 
-      if (L.is('Array', attrs)) {
-        attrs = {path: attrs};
+      if (L.is('Array', command)) {
+        command = {path: command};
       }
 
-      path = L.E('path', attrs, this, options);
-
+      path = L.E('path', command, this, options);
       return path;
     },
 
-    // create image element
+    /**
+     * Create image element.
+     *
+     * @param {String} src
+     * @param {Number} x - x coordinate of the top left corner
+     * @param {Number} y - y coordinate of the top left corner
+     * @param {Number} w - width
+     * @param {Number} h - height
+     * @param {Object} attrs -  additional attributes described
+     *                 by `Element.attr`
+     *
+     * @api public
+     */
+
     image: function (src, x, y, w, h, attrs) {
       var pos = {src: src, x: x || 0, y: y || 0, w: w || 0, h: h || 0}
         , image = L.E('image', L.extend(pos, attrs), this);
@@ -154,7 +183,16 @@
       return image;
     },
 
-    // redraws all elements
+    /**
+     * Redraw all elemenets into canvas. Additional callback
+     * can be passed to execute for each element before rendering.
+     *
+     *
+     * @param {Function} callback
+     *
+     * @api public
+     */
+
     redraw: function (callback) {
       this.clear();
       for (var i = 0, l = this.elements.length; i < l; i++) {
@@ -164,34 +202,53 @@
       }
     },
 
-    // clears paper, removes all elements
-    reset: function () {
-      //var events = this.events;
-      /*
-      cevents.forEach(function (name) {
-        if (events[name]) {
-          events[name].splice(0, events[name].length);
-        }
-      });
-      */
+    /**
+     * Reset leonardo state. Remove all elements
+     * and clear canvas.
+     *
+     * @api public
+     */
 
+    reset: function () {
       this.elements.splice(0, this.elements.length);
       this.flags = {};
       this.clear();
     },
 
-    // clears paper keeps all elements in memory
+    /**
+     * Clear canvas. Elements are preserved in memory.
+     *
+     * @api public
+     */
+
     clear: function () {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.beginPath();
     },
 
-    // returns pixel for given position
-    // useful for testing
+    /**
+     * Return a `CanvasPixelArray` object which presents
+     * single object on canvas.
+     *
+     * @param {Number} x
+     * @param {Number} y
+     *
+     * @api public
+     */
+
     getPx: function (x, y) {
       return this.ctx.getImageData(x, y, 1, 1).data;
     },
 
+    /**
+     * Return a hexadecimal color from given pixel
+     * from given position.
+     *
+     * @param {Number} x
+     * @param {Number} y
+     *
+     * @pi public
+     */
     getPxColor: function (x, y) {
       var px = this.getPx(x, y);
       if (px[0] === 0 && px[1] === 0 && px[2] === 0) {
@@ -202,21 +259,35 @@
     }
   };
 
+  // attach api to prototype
   L.prototype = L.fn;
 
   // static functions
 
   L.toString = function () {
     return "Leonardo ver. " + L.version;
-  }
+  };
 
-  L.proxy = function (func, context) {
+  /**
+   * Create proxy for given `Function` and context.
+   *
+   * @param {Function} func
+   * @param {Object} ctx
+   *
+   */
+  L.proxy = function (fn, ctx) {
     return function () {
-      func.apply(context, arguments);
+      fn.apply(ctx, arguments);
     }
-  }
+  };
 
-  // create canvas
+  /**
+   * Create or reference canvas element for
+   * given arguments.
+   *
+   * @api private
+   */
+
   L.createCanvas = function () {
     var c, args = arguments;
     if (args.length == 4) {
@@ -235,45 +306,98 @@
     }
 
     return c;
-  }
+  };
 
-  L.extend = function(obj) {
-    [].slice.call(arguments, 1).forEach(function(source) {
-      for (var prop in source) {
-        if (source[prop] !== void 0) { obj[prop] = source[prop]; }
+  /**
+   * Extend given object with passed arguments.
+   *
+   * @param {Object} obj
+   *
+   * @api private
+   */
+
+  L.extend = function (obj) {
+    var args = slice.call(arguments, 1), src;
+    for (var i = 0, l = args.length; i < l; i++) {
+      src = args[i];
+      for (var prop in src) {
+        if (src[prop] !== void 0) { obj[prop] = src[prop]; }
       }
-    });
+    }
     return obj;
   };
+
+  /**
+   * Test type of given argument.
+   *
+   * @param {String} type
+   * @param {Object} obj
+   *
+   * @api private
+   */
 
   L.is = function (type, obj) {
     var clas = L.typeOf(obj);
     return typeof obj != "undefined" && obj !== null && clas === type;
-  }
+  };
+
+  /**
+   * Return type of given object.
+   *
+   * @param {Object} obj
+   *
+   * @api private
+   */
 
   L.typeOf = function (obj) {
     return Object.prototype.toString.call(obj).slice(8, -1);
-  }
+  };
 
-  L.A = [];
+  /**
+   * Check if all items of given array are numeric.
+   *
+   * @api private
+   */
 
-  L.isAllN = function (o) {
-    for (var i = 0, l = o.length; i < l; i++) {
-      if (!L.is("Number", o[i])) {
+  L.isAllN = function (array) {
+    for (var i = 0, l = array.length; i < l; i++) {
+      if (!L.is("Number", array[i])) {
         return false;
       }
     }
     return true;
-  }
+  };
 
-  // uuid https://gist.github.com/982883
-  L.uuid = function b (a) {
-    return a ? (a^Math.random()*16>>a/4).toString(16) : ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, b);
-  }
+  /**
+   * Generate uuid.
+   * https://gist.github.com/982883
+   *
+   * @api private
+   */
+
+  L.uuid = function b(a) {
+    return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b);
+  };
+
+  /**
+   * Convert given degrees to radians.
+   *
+   * @param {Number} deg
+   *
+   * @api private
+   */
 
   L.rad = function (deg) {
     return deg % 360 * Math.PI / 180;
   };
+
+  /**
+   * Convert given radians to degrees.
+   *
+   * @param {Number} rad
+   *
+   * @api private
+   */
 
   L.deg = function (rad) {
     return rad * 180 / Math.PI % 360;
