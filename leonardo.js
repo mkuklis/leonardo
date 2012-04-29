@@ -12,7 +12,7 @@
     , slice = Array.prototype.slice;
 
   /**
-   * Initialize `Leonardo` for the given parameters.
+   * Initializes `Leonardo` for the given parameters.
    *
    * Canvas object will be created or referenced from DOM
    * based on given paramenters.
@@ -31,7 +31,6 @@
    * or:
    *
    * @param {Array} all - combination of parameters passed as Array
-   *
    * @api public
    */
 
@@ -46,9 +45,8 @@
   }
 
   /**
-   * Initialize `Leonardo` for the given parameters.
-   * Shortcut for `Leonardo` constructor to avoid typing `new`
-   *
+   * Initializes `Leonardo` for the given parameters.
+   * Shortcut to `Leonardo` constructor.
    * @api public
    */
 
@@ -61,11 +59,10 @@
   L.debug = false;
 
   /**
-   * Register callback executed during constructor
+   * Registers callback executed during constructor
    * initialization. Used by `Leonardo` and `Element`.
    *
    * @param {Function} fn
-   *
    * @api private
    */
 
@@ -87,7 +84,7 @@
     constructor: L,
 
     /**
-     * Create circle element.
+     * Creates circle element.
      *
      * @param {Number} x - x coordinate of the centre
      * @param {Number} y - y coordinate of the centre
@@ -95,7 +92,6 @@
      *
      * @param {Object} attrs - additional attributes
      * described by `Element.attr`
-     *
      * @api public
      */
 
@@ -107,7 +103,7 @@
     },
 
     /**
-     * Create rectangle element.
+     * Creates rectangle element.
      *
      * @param {Number} x - x coordinate of the top left corner
      * @param {Number} y - y coordinate of the top left corner
@@ -117,7 +113,6 @@
      *
      * @param {Object} attrs - additional attributes
      * described by `Element.attr`
-     *
      * @api public
      */
 
@@ -128,7 +123,7 @@
     },
 
     /**
-     * Create path element.
+     * Creates path element.
      * Path can be used to draw lines, polygons and curves.
      * Command argument represents single path command or multiple
      * commands passed as {Array}.
@@ -147,7 +142,6 @@
      * or
      *
      * @param {Array} command
-     *
      * @api public
      */
 
@@ -163,7 +157,7 @@
     },
 
     /**
-     * Create image element.
+     * Creates image element.
      *
      * @param {String} src
      * @param {Number} x - x coordinate of the top left corner
@@ -172,7 +166,6 @@
      * @param {Number} h - height
      * @param {Object} attrs -  additional attributes described
      *                 by `Element.attr`
-     *
      * @api public
      */
 
@@ -184,12 +177,11 @@
     },
 
     /**
-     * Redraw all elemenets into canvas. Additional callback
+     * Redraws all elemenets into canvas. Additional callback
      * can be passed to execute for each element before rendering.
      *
      *
      * @param {Function} callback
-     *
      * @api public
      */
 
@@ -203,9 +195,8 @@
     },
 
     /**
-     * Reset leonardo state. Remove all elements
+     * Resets leonardo state. Remove all elements
      * and clear canvas.
-     *
      * @api public
      */
 
@@ -216,8 +207,7 @@
     },
 
     /**
-     * Clear canvas. Elements are preserved in memory.
-     *
+     * Clears canvas. Elements are preserved in memory.
      * @api public
      */
 
@@ -227,12 +217,11 @@
     },
 
     /**
-     * Return a `CanvasPixelArray` object which presents
+     * Returns a `CanvasPixelArray` object which presents
      * single object on canvas.
      *
      * @param {Number} x
      * @param {Number} y
-     *
      * @api public
      */
 
@@ -241,8 +230,8 @@
     },
 
     /**
-     * Return a hexadecimal color from given pixel
-     * from given position.
+     * Returns a hexadecimal color from given pixel
+     * for given position.
      *
      * @param {Number} x
      * @param {Number} y
@@ -269,7 +258,7 @@
   };
 
   /**
-   * Create proxy for given `Function` and context.
+   * Creates proxy for given `Function` and context.
    *
    * @param {Function} func
    * @param {Object} ctx
@@ -282,9 +271,8 @@
   };
 
   /**
-   * Create or reference canvas element for
+   * Creates or references canvas element for
    * given arguments.
-   *
    * @api private
    */
 
@@ -309,10 +297,9 @@
   };
 
   /**
-   * Extend given object with passed arguments.
+   * Extends given object with passed arguments.
    *
    * @param {Object} obj
-   *
    * @api private
    */
 
@@ -328,11 +315,10 @@
   };
 
   /**
-   * Test type of given argument.
+   * Tests type of given argument.
    *
    * @param {String} type
    * @param {Object} obj
-   *
    * @api private
    */
 
@@ -342,10 +328,9 @@
   };
 
   /**
-   * Return type of given object.
+   * Returns type of given object.
    *
    * @param {Object} obj
-   *
    * @api private
    */
 
@@ -354,8 +339,7 @@
   };
 
   /**
-   * Check if all items of given array are numeric.
-   *
+   * Checks if all items of given array are numeric.
    * @api private
    */
 
@@ -369,9 +353,8 @@
   };
 
   /**
-   * Generate uuid.
+   * Generates uuid.
    * https://gist.github.com/982883
-   *
    * @api private
    */
 
@@ -380,10 +363,9 @@
   };
 
   /**
-   * Convert given degrees to radians.
+   * Converts given degrees to radians.
    *
    * @param {Number} deg
-   *
    * @api private
    */
 
@@ -392,10 +374,9 @@
   };
 
   /**
-   * Convert given radians to degrees.
+   * Converts given radians to degrees.
    *
    * @param {Number} rad
-   *
    * @api private
    */
 
@@ -577,9 +558,16 @@
   };
 })(Leonardo);
 
+/*!
+ * Leonardo
+ * Copyright(c) 2012 Michal Kuklis <michal.kuklis@gmail.com>
+ * MIT Licensed
+ */
+
 (function (L) {
 
-  // path commands
+  // path commands used by `Leonardo.path`
+  // executed in the context of `Element`
   var pathCommands = {
         // move
         M: function (v) {
@@ -613,7 +601,7 @@
         }
       }
 
-    // draw commands which execute in the context of the element
+    // draw commands executed in the context of the `Element`
     , drawCommmands = {
         circle: function (a) {
           this.ctx.arc(a.tx, a.ty, a.r, 0, Math.PI * 2, true);
@@ -624,7 +612,9 @@
           this.updateBbox({x: a.tx, y: a.ty, w: a.w, h: a.h});
         }
       , path: function () {
-          this.attrs.path.forEach(this.processPath, this);
+          this.attrs.path.forEach(function (p) {
+            for (var c in p) { pathCommands[c].call(this, p[c]); }
+          }, this);
         }
       , image: function (a) {
           this.processImage();
@@ -632,11 +622,23 @@
         }
       };
 
-  // element constructor
-  var E = function (type, attrs, leonardo, options) {
+  /**
+   * Initializes `Element` object.
+   *
+   * Represents drawing element. Supported types are:
+   * circle, rect, path, image.
+   *
+   * @param {String} type
+   * @param {Object} attrs
+   * @param {Leonardo} leonardo
+   * @param {Object} options
+   * @api public
+   */
 
-    if (!(this instanceof E)) {
-      return new E(type, attrs, leonardo, options);
+  var Element = function (type, attrs, leonardo, options) {
+
+    if (!(this instanceof Element)) {
+      return new Element(type, attrs, leonardo, options);
     }
 
     options = options || {};
@@ -651,8 +653,7 @@
     this.attrs = attrs;
     this.l = leonardo;
     this.ctx = this.l.ctx;
-    // this.m = new L.Matrix(); // transformation matrix
-    // this.trans = {}; // tansformations
+
     // bbox
     this.bbox = {x: Infinity, y: Infinity, w: 0, h: 0};
 
@@ -666,16 +667,62 @@
       this.l.elements.push(this);
     }
 
-    //this.updateCoords();
-
-    E.init.call(this);
+    Element.init.call(this);
   }
+
+  // element shortcut
+  var E = Element;
 
   E.init = L.init;
 
   // Element API
   E.fn = {
     constructor: E,
+
+    /**
+     * Sets attributes for element.
+     * Gets attribute value if attrName is passed.
+     * Gets array of values if array of attrNames is passed
+     *
+     * Possible attributes:
+     *
+     * x {Number} - the x-axis coordinate
+     * y {Number} - the y-axis coordinate
+     * w {Number} - width
+     * h {Number} - height
+     * r {Number} - radius for circle or rounded corner for rect
+     * cx {Number} - the x-axis coordinate of the center of the circle, or ellipse
+     * cy {Number} - the y-axis coordinate of the center of the circle, or ellipse
+     * fill {String} - color, gradient, image
+     * opacity {Number}
+     * stroke {String} - color default is '#000000'
+     * stroke-width {Number} - stroke width in pixels default is '1'
+     * stroke-opacity {Number}
+     * text-position {String} - position of the text in the format
+     * vertical-align:horizontal-align default is 'center:middle'
+     * font {String} - font name and size default is '10px sans-serif'
+     * font-color {String} - font color default is '#000000'
+     * src {String} - image URL for `Element.image`
+     *
+     * Parameters:
+     *
+     * @param {Object} args - name/value pairs
+     * @param {Object} options
+     *
+     * or:
+     *
+     * @param {String} attrName
+     *
+     * or:
+     *
+     * @param {Array} attrNames
+     *
+     * @return {Element} when attributes are being set
+     * @return {...} value of the attribute if attrName is passed
+     * @return {Array} values of the attirbutes if attrNames are passed
+     * @api public
+     */
+
     attr: function (args, options) {
 
       if (L.is('String', args)) {
@@ -697,9 +744,24 @@
       return this;
     },
 
+    /**
+     * Redraws element on canvas.
+     *
+     * Currently this call is very expensive
+     * and redraws all elements.
+     * @api public
+     */
+
     redraw: function () {
       this.l.redraw();
     },
+
+    /**
+     * Draws element on canvas.
+     *
+     * @return {Element}
+     * @api public
+     */
 
     draw: function () {
       var a = this.attrs;
@@ -711,7 +773,7 @@
       }
 
       a.stroke = a.stroke || '#000000';
-      this.ctx.strokeStyle = L.C.toColor(a.stroke, a['stroke-opacity']);
+      this.ctx.strokeStyle = L.C.toColor(a.stroke, a.stroke-opacity);
       this.ctx.lineWidth = a['stroke-width'] || 1.0;
 
       if (this.trans) {
@@ -746,6 +808,12 @@
       return this;
     },
 
+    /**
+     * Updates internal coordinates.
+     *
+     * @api private
+     */
+
     updateCoords: function () {
       var a = this.attrs;
       // transformation present
@@ -771,15 +839,29 @@
       }
     },
 
+    /**
+     * Creates and returns color or gradient.
+     *
+     * @return {String} rgba color
+     * @return {String} gradient
+     * @api private
+     */
+
     createStyle: function () {
       var a = this.attrs;
 
       if (E.isGradient(a.fill)) {
-        return this.parseGradient(a.fill);
+        return this.processGradient(a.fill);
       }
 
       return L.C.toColor(a.fill, a.opacity);
     },
+
+    /**
+     * Processes attributes related to text.
+     *
+     * @api private
+     */
 
     processText: function () {
       var attrs = this.attrs
@@ -799,6 +881,12 @@
       this.ctx.fillText(attrs.text, attrs.x - attrs.dx, attrs.y - attrs.dy);
     },
 
+    /**
+     * Processes attributes related to image.
+     *
+     * @api private
+     */
+
     processImage: function () {
       var attrs = this.attrs;
 
@@ -815,9 +903,32 @@
       }
     },
 
-    parseGradient: function (str) {
-      var g = str.split(":")
-        , a = this.attrs
+    /**
+     * Processes gradient based on the `fill` attribute.
+     *
+     * Radial and linear gradients are supported.
+     *
+     * gradient format:
+     *
+     * type:number-color:number-color:number-color
+     *
+     * where:
+     *  type - 'r' for radian and 'l' for linear
+     *  number - represents the position of the color stop
+     *  color - color
+     *
+     * Example:
+     *
+     * r:0-#A7D30C:0.9-#019F62:1-#fefefe
+     *
+     *
+     * @return {CanvasGradient}
+     * @api private
+     */
+
+    processGradient: function () {
+      var a = this.attrs
+        , g = a.split(":")
         , type = g.shift()
         , last = g[g.length - 1]
         , args, gr;
@@ -846,11 +957,12 @@
       return gr;
     },
 
-    processPath: function (p) {
-      for (var c in p) {
-        pathCommands[c].call(this, p[c]);
-      }
-    },
+    /**
+     * Updates bbox state.
+     *
+     * @param {Object} a
+     * @api private
+     */
 
     updateBbox: function (a) {
       var b = this.bbox;
@@ -866,6 +978,12 @@
       }
     },
 
+    /**
+     * Returns element's bbox.
+     *
+     * @return {Object}
+     * @api public
+     */
     getBbox: function () {
       return this.bbox;
     }
