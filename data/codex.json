@@ -1,0 +1,28 @@
+{
+  "locals": {
+    "title": "Leonardo",
+    "googleanalytics": "",
+    "mixpanel": "",
+    "ghuser": "mkuklis",
+    "ghbaseurl": "./",
+    "ghproject": "leonardo",
+    "tweeturl": "https://github.com/mkuklis/leonardo",
+    "tweetvia": "",
+    "tweetrelated": "",
+    "twitterfollow": "",
+    "version": "0.1.0",
+    "hasdownloads": false,
+    "outDir": "./",
+    "description": "Leonardo is a JavaScript library that aims to simplify your work with HTML5 canvas."
+  },
+  "plugins": [
+    { "name": "code"
+    , "files": [
+          { "name": "constructor"
+          , "title": "the constructor"
+          , "file": "../code/constructor.js"
+          , "description": "This is the description for the constructor." }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+@import 'nib'
+@import 'fez'
+@import 'scrollbar'
+
+global-reset()
+fez-reset()
+
+
+// Fonts
+font_headers = "Quicksand", "Helvetica Neue", Helvetica, Arial, sans-serif
+font_accents = "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif
+
+// Colors
+primary = #F9F9F9 // background
+accent = darken(primary, 60%) 
+headers = #424B5C 
+ghbg = #E8DEAD
+clonebg = #E4DAD8
+
+
+buttonbig = #A6AEBB
+buttonsmall = #575639
+
+body
+  font 13px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif
+  background-color lighten(primary, 50%)
+
+h1, h2, h3, h4
+  font-family font_headers
+
+a
+  color buttonbig
+  text-decoration none
+
+h1
+  color headers
+  font-size 3em
+  > a
+    color headers
+
+h3
+  color accent
+  font-size 2em
+  margin-top 1em
+  clearfix()
+  > a
+    color accent
+
+h4
+  font-size 1.5em
+
+strong
+  font-weight bold
+pre
+  background #fff
+
+em
+  font-style italic
+  font-weight bold
+
+header, section#content, footer
+  width 740px
+  margin-left 220px
+
+.box-wrap
+  margin-bottom 50px
+
+.box, .box .antiscroll-inner
+  max-height 340px
+  width 140px
+
+header
+  clearfix()
+  margin-top 50px
+  h1
+    font-size 65px
+    margin 0
+    padding 0
+  .description
+    color lighten(#000, 40%)
+    margin-bottom 1.2em
+    font-size 16px
+    font-family "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif
+  .gh
+    clearfix()
+    background primary
+    border 1px solid darken(primary, 20%)
+    border-radius 5px
+    padding 10px
+    position relative
+    min-height 90px
+    h4
+      text-shadow 1px 1px 0px #fff
+      margin-bottom 10px
+      color lighten(#000, 40%)
+      #latestCommitURL
+        font-size 11px
+        margin-left 10px
+    #commit
+      font-size 10px
+      margin-right 10px
+      line-height 18px
+      padding 0px 5px
+      background lighten(primary, 70%)
+      border-radius 3px
+      float left
+      color darken(primary, 30%)
+      a
+        color darken(primary, 30%)
+        font-style italic
+    #latestCommitMessage
+      line-height 20px
+      text-shadow 1px 1px 0px #fff
+    #buttons
+      margin-top 10px
+      clearfix()
+      .btn
+        float left
+    #links
+      position absolute
+      top 10px
+      right 10px
+      font-size 11px
+      line-height 18px
+      a
+        color buttonbig
+        padding 0px 10px
+        &:hover
+          text-decoration underline
+
+section#content
+  margin-top 50px
+  margin-bottom 50px
+  min-height 350px
+
+  h1
+    padding-top 10px
+    margin-top 85px
+  h2
+    padding-top 15px
+    margin-top 25px
+  p
+    code
+      padding 3px 5px
+      background darken(primary, 5%)
+
+nav
+  position fixed
+  top 65px
+  left 30px
+  width 140px
+
+  ul
+    list-style none
+    margin-bottom 50px
+    li
+      margin-left 0px
+      margin-right 12px
+      text-align right
+      &.keepcase
+        a
+          text-transform none !important
+      &.header
+        font-weight bold
+      a
+        color lighten(#000, 40%)
+        font-family font_accents 
+        font-size 14px
+        &:hover
+          text-decoration underline
+        &.section
+          font-size 16px
+          text-decoration none
+          font-weight: bold
+          color #000
+footer
+  margin-top 100px
+  padding-top 25px
+  margin-bottom 50px
+  border-top 1px solid accent
+  color lighten(#000, 50%)
+  text-transform lowercase
+
+@import 'code'
