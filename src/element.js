@@ -122,11 +122,21 @@
      *
      * Possible attributes:
      *
-     * x {Number} - x coordinate
-     * y {Number} - y coordinate
+     * x {Number} - the x-axis coordinate
+     * y {Number} - the y-axis coordinate
      * w {Number} - width
      * h {Number} - height
-     *
+     * r {Number} - radius for circle or rounded corner for rect
+     * cx {Number} - the x-axis coordinate of the center of the circle, or ellipse
+     * cy {Number} - the y-axis coordinate of the center of the circle, or ellipse
+     * fill {String} - color, gradient, image
+     * stroke-width {Number} - stroke width in pixels default is '1'
+     * text-position {String} - position of the text in the format
+     *                          vertical-align:horizontal-align
+     *                          default is 'center:middle'
+     * font {String} - font name and size default is '10px sans-serif'
+     * font-color {String} - font color default is '#000000'
+     * src {String} - image URL for `Element.image`
      *
      * Parameters:
      *
@@ -144,7 +154,9 @@
      * @return {Element} when attributes are being set
      * @return {...} value of the attribute if attrName is passed
      * @return {Array} values of the attirbutes if attrNames are passed
+     * @api public
      */
+
     attr: function (args, options) {
 
       if (L.is('String', args)) {
