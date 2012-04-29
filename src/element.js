@@ -52,7 +52,9 @@
           this.updateBbox({x: a.tx, y: a.ty, w: a.w, h: a.h});
         }
       , path: function () {
-          this.attrs.path.forEach(this.processPath, this);
+          this.attrs.path.forEach(function (p) {
+            for (var c in p) { pathCommands[c].call(this, p[c]); }
+          }, this);
         }
       , image: function (a) {
           this.processImage();
@@ -75,8 +77,8 @@
 
   var Element = function (type, attrs, leonardo, options) {
 
-    if (!(this instanceof E)) {
-      return new E(type, attrs, leonardo, options);
+    if (!(this instanceof Element)) {
+      return new Element(type, attrs, leonardo, options);
     }
 
     options = options || {};
@@ -105,9 +107,11 @@
       this.l.elements.push(this);
     }
 
-    E.init.call(this);
+    Element.init.call(this);
   }
 
+  // element shortcut
+  E = Element;
 
   E.init = L.init;
 
@@ -130,10 +134,12 @@
      * cx {Number} - the x-axis coordinate of the center of the circle, or ellipse
      * cy {Number} - the y-axis coordinate of the center of the circle, or ellipse
      * fill {String} - color, gradient, image
+     * opacity {Number}
+     * stroke {String} - color default is '#000000'
      * stroke-width {Number} - stroke width in pixels default is '1'
+     * stroke-opacity {Number}
      * text-position {String} - position of the text in the format
-     *                          vertical-align:horizontal-align
-     *                          default is 'center:middle'
+     * vertical-align:horizontal-align default is 'center:middle'
      * font {String} - font name and size default is '10px sans-serif'
      * font-color {String} - font color default is '#000000'
      * src {String} - image URL for `Element.image`
@@ -178,9 +184,24 @@
       return this;
     },
 
+    /**
+     * Redraws element on canvas.
+     *
+     * Currently this call is very expensive
+     * and redraws all elements.
+     * @api public
+     */
+
     redraw: function () {
       this.l.redraw();
     },
+
+    /**
+     * Draws element on canvas.
+     *
+     * @return {Element}
+     * @api public
+     */
 
     draw: function () {
       var a = this.attrs;
@@ -227,6 +248,12 @@
       return this;
     },
 
+    /**
+     * Updates internal coordinates.
+     *
+     * @api private
+     */
+
     updateCoords: function () {
       var a = this.attrs;
       // transformation present
@@ -252,15 +279,29 @@
       }
     },
 
+    /**
+     * Creates and returns color or gradient.
+     *
+     * @return {String} rgba color
+     * @return {String} gradient
+     * @api private
+     */
+
     createStyle: function () {
       var a = this.attrs;
 
       if (E.isGradient(a.fill)) {
-        return this.parseGradient(a.fill);
+        return this.processGradient(a.fill);
       }
 
       return L.C.toColor(a.fill, a.opacity);
     },
+
+    /**
+     * Processes attributes related to text.
+     *
+     * @api private
+     */
 
     processText: function () {
       var attrs = this.attrs
@@ -280,6 +321,12 @@
       this.ctx.fillText(attrs.text, attrs.x - attrs.dx, attrs.y - attrs.dy);
     },
 
+    /**
+     * Processes attributes related to image.
+     *
+     * @api private
+     */
+
     processImage: function () {
       var attrs = this.attrs;
 
@@ -296,9 +343,32 @@
       }
     },
 
-    parseGradient: function (str) {
-      var g = str.split(":")
-        , a = this.attrs
+    /**
+     * Processes gradient based on the `fill` attribute.
+     *
+     * Radial and linear gradients are supported.
+     *
+     * gradient format:
+     *
+     * type:number-color:number-color:number-color
+     *
+     * where:
+     *  type - 'r' for radian and 'l' for linear
+     *  number - represents the position of the color stop
+     *  color - color
+     *
+     * Example:
+     *
+     * r:0-#A7D30C:0.9-#019F62:1-#fefefe
+     *
+     *
+     * @return {CanvasGradient}
+     * @api private
+     */
+
+    processGradient: function () {
+      var a = this.attrs
+        , g = a.split(":")
         , type = g.shift()
         , last = g[g.length - 1]
         , args, gr;
@@ -327,11 +397,12 @@
       return gr;
     },
 
-    processPath: function (p) {
-      for (var c in p) {
-        pathCommands[c].call(this, p[c]);
-      }
-    },
+    /**
+     * Updates bbox state.
+     *
+     * @param {Object} a
+     * @api private
+     */
 
     updateBbox: function (a) {
       var b = this.bbox;
@@ -347,6 +418,12 @@
       }
     },
 
+    /**
+     * Returns element's bbox.
+     *
+     * @return {Object}
+     * @api public
+     */
     getBbox: function () {
       return this.bbox;
     }
