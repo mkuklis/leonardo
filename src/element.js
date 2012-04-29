@@ -111,7 +111,7 @@
   }
 
   // element shortcut
-  E = Element;
+  var E = Element;
 
   E.init = L.init;
 
