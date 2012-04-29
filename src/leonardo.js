@@ -47,7 +47,7 @@
 
   /**
    * Initialize `Leonardo` for the given parameters.
-   * Shortcut for `Leonardo` constructor to avoid typing `new`
+   * Shortcut to `Leonardo` constructor.
    *
    * @api public
    */
@@ -242,7 +242,7 @@
 
     /**
      * Return a hexadecimal color from given pixel
-     * from given position.
+     * for given position.
      *
      * @param {Number} x
      * @param {Number} y
