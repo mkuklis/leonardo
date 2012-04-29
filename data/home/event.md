@@ -1,6 +1,6 @@
 ---
-  title: Animation
-  weight: 300
+  title: Event
+  weight: 500
   render-file: false
   section: true
 ---

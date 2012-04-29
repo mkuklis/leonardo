@@ -5,4 +5,4 @@
   section: true
 ---
 
-## Leonardo core methods
+# Core methods

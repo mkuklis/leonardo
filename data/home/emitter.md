@@ -1,6 +1,7 @@
 ---
-  title: Animation
-  weight: 300
+  title: Emitter
+  weight: 700
   render-file: false
   section: true
 ---
+
