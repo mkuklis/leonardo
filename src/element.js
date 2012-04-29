@@ -1,6 +1,13 @@
+/*!
+ * Leonardo
+ * Copyright(c) 2012 Michal Kuklis <michal.kuklis@gmail.com>
+ * MIT Licensed
+ */
+
 (function (L) {
 
-  // path commands
+  // path commands used by `Leonardo.path`
+  // executed in the context of `Element`
   var pathCommands = {
         // move
         M: function (v) {
@@ -34,7 +41,7 @@
         }
       }
 
-    // draw commands which execute in the context of the element
+    // draw commands executed in the context of the `Element`
     , drawCommmands = {
         circle: function (a) {
           this.ctx.arc(a.tx, a.ty, a.r, 0, Math.PI * 2, true);
@@ -53,8 +60,20 @@
         }
       };
 
-  // element constructor
-  var E = function (type, attrs, leonardo, options) {
+  /**
+   * Initializes `Element` object.
+   *
+   * Represents drawing element. Supported types are:
+   * circle, rect, path, image.
+   *
+   * @param {String} type
+   * @param {Object} attrs
+   * @param {Leonardo} leonardo
+   * @param {Object} options
+   * @api public
+   */
+
+  var Element = function (type, attrs, leonardo, options) {
 
     if (!(this instanceof E)) {
       return new E(type, attrs, leonardo, options);
@@ -72,8 +91,7 @@
     this.attrs = attrs;
     this.l = leonardo;
     this.ctx = this.l.ctx;
-    // this.m = new L.Matrix(); // transformation matrix
-    // this.trans = {}; // tansformations
+
     // bbox
     this.bbox = {x: Infinity, y: Infinity, w: 0, h: 0};
 
@@ -87,16 +105,46 @@
       this.l.elements.push(this);
     }
 
-    //this.updateCoords();
-
     E.init.call(this);
   }
+
 
   E.init = L.init;
 
   // Element API
   E.fn = {
     constructor: E,
+
+    /**
+     * Sets attributes for element.
+     * Gets attribute value if attrName is passed.
+     * Gets array of values if array of attrNames is passed
+     *
+     * Possible attributes:
+     *
+     * x {Number} - x coordinate
+     * y {Number} - y coordinate
+     * w {Number} - width
+     * h {Number} - height
+     *
+     *
+     * Parameters:
+     *
+     * @param {Object} args - name/value pairs
+     * @param {Object} options
+     *
+     * or:
+     *
+     * @param {String} attrName
+     *
+     * or:
+     *
+     * @param {Array} attrNames
+     *
+     * @return {Element} when attributes are being set
+     * @return {...} value of the attribute if attrName is passed
+     * @return {Array} values of the attirbutes if attrNames are passed
+     */
     attr: function (args, options) {
 
       if (L.is('String', args)) {
@@ -132,7 +180,7 @@
       }
 
       a.stroke = a.stroke || '#000000';
-      this.ctx.strokeStyle = L.C.toColor(a.stroke, a['stroke-opacity']);
+      this.ctx.strokeStyle = L.C.toColor(a.stroke, a.stroke-opacity);
       this.ctx.lineWidth = a['stroke-width'] || 1.0;
 
       if (this.trans) {

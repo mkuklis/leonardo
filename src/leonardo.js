@@ -12,7 +12,7 @@
     , slice = Array.prototype.slice;
 
   /**
-   * Initialize `Leonardo` for the given parameters.
+   * Initializes `Leonardo` for the given parameters.
    *
    * Canvas object will be created or referenced from DOM
    * based on given paramenters.
@@ -31,7 +31,6 @@
    * or:
    *
    * @param {Array} all - combination of parameters passed as Array
-   *
    * @api public
    */
 
@@ -46,9 +45,8 @@
   }
 
   /**
-   * Initialize `Leonardo` for the given parameters.
+   * Initializes `Leonardo` for the given parameters.
    * Shortcut to `Leonardo` constructor.
-   *
    * @api public
    */
 
@@ -61,11 +59,10 @@
   L.debug = false;
 
   /**
-   * Register callback executed during constructor
+   * Registers callback executed during constructor
    * initialization. Used by `Leonardo` and `Element`.
    *
    * @param {Function} fn
-   *
    * @api private
    */
 
@@ -87,7 +84,7 @@
     constructor: L,
 
     /**
-     * Create circle element.
+     * Creates circle element.
      *
      * @param {Number} x - x coordinate of the centre
      * @param {Number} y - y coordinate of the centre
@@ -95,7 +92,6 @@
      *
      * @param {Object} attrs - additional attributes
      * described by `Element.attr`
-     *
      * @api public
      */
 
@@ -107,7 +103,7 @@
     },
 
     /**
-     * Create rectangle element.
+     * Creates rectangle element.
      *
      * @param {Number} x - x coordinate of the top left corner
      * @param {Number} y - y coordinate of the top left corner
@@ -117,7 +113,6 @@
      *
      * @param {Object} attrs - additional attributes
      * described by `Element.attr`
-     *
      * @api public
      */
 
@@ -128,7 +123,7 @@
     },
 
     /**
-     * Create path element.
+     * Creates path element.
      * Path can be used to draw lines, polygons and curves.
      * Command argument represents single path command or multiple
      * commands passed as {Array}.
@@ -147,7 +142,6 @@
      * or
      *
      * @param {Array} command
-     *
      * @api public
      */
 
@@ -163,7 +157,7 @@
     },
 
     /**
-     * Create image element.
+     * Creates image element.
      *
      * @param {String} src
      * @param {Number} x - x coordinate of the top left corner
@@ -172,7 +166,6 @@
      * @param {Number} h - height
      * @param {Object} attrs -  additional attributes described
      *                 by `Element.attr`
-     *
      * @api public
      */
 
@@ -184,12 +177,11 @@
     },
 
     /**
-     * Redraw all elemenets into canvas. Additional callback
+     * Redraws all elemenets into canvas. Additional callback
      * can be passed to execute for each element before rendering.
      *
      *
      * @param {Function} callback
-     *
      * @api public
      */
 
@@ -203,9 +195,8 @@
     },
 
     /**
-     * Reset leonardo state. Remove all elements
+     * Resets leonardo state. Remove all elements
      * and clear canvas.
-     *
      * @api public
      */
 
@@ -216,8 +207,7 @@
     },
 
     /**
-     * Clear canvas. Elements are preserved in memory.
-     *
+     * Clears canvas. Elements are preserved in memory.
      * @api public
      */
 
@@ -227,12 +217,11 @@
     },
 
     /**
-     * Return a `CanvasPixelArray` object which presents
+     * Returns a `CanvasPixelArray` object which presents
      * single object on canvas.
      *
      * @param {Number} x
      * @param {Number} y
-     *
      * @api public
      */
 
@@ -241,7 +230,7 @@
     },
 
     /**
-     * Return a hexadecimal color from given pixel
+     * Returns a hexadecimal color from given pixel
      * for given position.
      *
      * @param {Number} x
@@ -269,7 +258,7 @@
   };
 
   /**
-   * Create proxy for given `Function` and context.
+   * Creates proxy for given `Function` and context.
    *
    * @param {Function} func
    * @param {Object} ctx
@@ -282,9 +271,8 @@
   };
 
   /**
-   * Create or reference canvas element for
+   * Creates or references canvas element for
    * given arguments.
-   *
    * @api private
    */
 
@@ -309,10 +297,9 @@
   };
 
   /**
-   * Extend given object with passed arguments.
+   * Extends given object with passed arguments.
    *
    * @param {Object} obj
-   *
    * @api private
    */
 
@@ -328,11 +315,10 @@
   };
 
   /**
-   * Test type of given argument.
+   * Tests type of given argument.
    *
    * @param {String} type
    * @param {Object} obj
-   *
    * @api private
    */
 
@@ -342,10 +328,9 @@
   };
 
   /**
-   * Return type of given object.
+   * Returns type of given object.
    *
    * @param {Object} obj
-   *
    * @api private
    */
 
@@ -354,8 +339,7 @@
   };
 
   /**
-   * Check if all items of given array are numeric.
-   *
+   * Checks if all items of given array are numeric.
    * @api private
    */
 
@@ -369,9 +353,8 @@
   };
 
   /**
-   * Generate uuid.
+   * Generates uuid.
    * https://gist.github.com/982883
-   *
    * @api private
    */
 
@@ -380,10 +363,9 @@
   };
 
   /**
-   * Convert given degrees to radians.
+   * Converts given degrees to radians.
    *
    * @param {Number} deg
-   *
    * @api private
    */
 
@@ -392,10 +374,9 @@
   };
 
   /**
-   * Convert given radians to degrees.
+   * Converts given radians to degrees.
    *
    * @param {Number} rad
-   *
    * @api private
    */
 
