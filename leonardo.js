@@ -17,7 +17,7 @@
    * Canvas object will be created or referenced from DOM
    * based on given paramenters.
    *
-   * Parameters:
+   * Parameter types:
    *
    * @param {String} container - DOM element or the ID of the canvas
    *
@@ -302,7 +302,6 @@
       }
     }
     else if (L.is("String", args[0])) {
-      console.log(args[0]);
       c = d.getElementById(args[0]);
     }
 
