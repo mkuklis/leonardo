@@ -11,7 +11,7 @@
     "tweetrelated": "",
     "twitterfollow": "",
     "version": "0.1.0",
-    "hasdownloads": false,
+    "hasdownloads": true,
     "outDir": "./",
     "description": "Leonardo is a JavaScript library that aims to simplify your work with HTML5 canvas."
   },

@@ -1,6 +1,8 @@
 ---
-  title: Core
+  title: leo
   weight: 100
   render-file: false
-  section: true
 ---
+
+
+Creates Leonardo object

@@ -13,7 +13,6 @@ block nav
           li: a.scroll(href='#' + href)= (page.menu || page.title)
 
   - if (files.page)
-    p pages
     ul.pages
       for page in files.page
         - if (page.template == 'code')
@@ -35,7 +34,7 @@ block content
         - var href = section.href.split('/')
         - href = href[href.length - 2]
         - if (section.section)
-          h1(id=href + '-section'): a(name=href)= section.title
-        else
           h1.section(id=href + '-section'): a(name=href)= section.title
+        else
+          h1(id=href + '-section'): a(name=href)= section.title
         section!= section.prepared
