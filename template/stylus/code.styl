@@ -1,5 +1,25 @@
 
+
 gray = #e6e6e6
+number = #c4daf5
+string = #94d971
+object = #face76
+
+table
+  border-spacing 10px
+  td
+    padding 3px
+    -webkit-border-radius 5px
+    -moz-border-radius 5px
+    border-radius 5px
+    &.string
+      text-align center
+      background-color string
+    &.number
+      background-color number
+    &.object
+      text-align center
+      background-color object
 
 pre
   padding 15px

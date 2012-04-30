@@ -11,7 +11,9 @@
     <script src=".//public/js/jq-mousewheel.js"></script>
     <script src=".//public/js/antiscroll.js"></script>
     <script src=".//public/js/prettify.js"></script>
+    <script src=".//leonardo.js"></script>
     <script src=".//public/js/main.js"></script>
+    <script src=".//public/js/leo.js"></script>
     <link rel="stylesheet" href=".//public/css/antiscroll.css" type="text/css" media="all">
     <link rel="stylesheet" href=".//public/css/main.css" type="text/css" media="all">
     <link href="http://fonts.googleapis.com/css?family=Lato:300|Quicksand" rel="stylesheet" type="text/css">
@@ -21,7 +23,7 @@
       <ul class="sections"><br>
         <li><a href="#leonardo" class="scroll section">Core</a>
         </li>
-        <li><a href="#leo" class="scroll">leo</a>
+        <li><a href="#leo" class="scroll">leonardo</a>
         </li>
         <li><a href="#circle" class="scroll">circle</a>
         </li>
@@ -110,11 +112,11 @@
 
 </p>
 <p><br />
-<a class="download" href='leonardo.js'>Development v1.0.1</a>
+<a class="download" href='leonardo.js'>Development v0.1.0</a>
 40kb, Full source, lots of comments
 
 </p>
-<p><a class="download" href='leonardo.js'>Production v1.0.1</a>
+<p><a class="download" href='leonardo.min.js'>Production v0.1.0</a>
 18kb, Packed and gzipped
 
 </p>
@@ -130,16 +132,99 @@
         </h1>
         <section>
         </section>
-        <h1 id="leo-section"><a name="leo">leo</a>
+        <h1 id="leo-section"><a name="leo">leonardo(...)</a>
         </h1>
-        <section><p>Creates Leonardo object
+        <section><p>Creates Leonardo object. Leonardo object contains a reference to canvas element.
+Canvas element will be created or referenced from DOM based on given paramenters during Leonardo initialization.
+All calls to drawing methods depend on Leonardo object so intialization has to happen first.
+
 </p>
+<p><strong> Parameter types </strong>
+
+</p>
+<table>
+  <tr>
+    <td>container</td>
+    <td class="type string">String</td>
+    <td>DOM element or the ID of the canvas</td>
+  </tr>
+  <tr><td colspan="3">or</td></tr>
+  <tr>
+    <td>x</td>
+    <td class="type number">Number</td>
+    <td>x coordinate</td>
+  </tr>
+  <tr>
+    <td>y</td>
+    <td class="type number">Number</td>
+    <td>y coordinate</td>
+  </tr>
+  <tr>
+    <td>width</td>
+    <td class="type number">Number</td>
+    <td>canvas width</td>
+  </tr>
+  <tr>
+    <td>height</td>
+    <td class="type number">Number</td>
+    <td>canvas height</td>
+  </tr>
+</table>
+
+<p><strong>Usage</strong>
+
+</p>
+<pre><code><span class="comment">// creates new leonardo object with 200px x 300px canvas at 50, 100</span>
+<span class="keyword">var</span> paper = leonardo(<span class="number">50</span>, <span class="number">100</span>, <span class="number">200</span>, <span class="number">300</span>);
+
+<span class="comment">// creates new leonardo object with a reference to canvas with id = #paper</span>
+<span class="keyword">var</span> paper = leonardo(<span class="string">"#paper"</span>);
+
+<span class="comment">// or if you are fun of new</span>
+<span class="keyword">var</span> paper = <span class="keyword">new</span> Leonardo(<span class="string">"#paper"</span>);</code></pre>
 
         </section>
-        <h1 id="circle-section"><a name="circle">circle</a>
+        <h1 id="circle-section"><a name="circle">leonardo.paper(x, y, r, [attrs])</a>
         </h1>
         <section><p>Draws a circle.
+
 </p>
+<p><strong>Parameters</strong>
+
+</p>
+<table>
+  <tr>
+    <td>x</td>
+    <td class="type number">Number</td>
+    <td>x coordinate of the centre</td>
+  </tr>
+  <tr>
+    <td>y</td>
+    <td class="type number">Number</td>
+    <td>y coordinate of the centre</td>
+  </tr>
+  <tr>
+    <td>r</td>
+    <td class="type number">Number</td>
+    <td>radius</td>
+  </tr>
+  <tr>
+    <td>attrs</td>
+    <td class="type object">Object</td>
+    <td>attributes</td>
+  </tr>
+
+</table>
+
+<p><strong>Usage</strong>
+
+</p>
+<pre><code><span class="comment">// creates and draws circle with radius 25 filled with color</span>
+<span class="keyword">var</span> circle = paper.circle(<span class="number">30</span>, <span class="number">30</span>, <span class="number">25</span>, {fill: <span class="string">'#FF7400'</span>});</code></pre>
+<p><strong>Example</strong>
+
+</p>
+<canvas id="circle" width="100" height="100"></canvas>
 
         </section>
         <h1 id="rect-section"><a name="rect">rect</a>

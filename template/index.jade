@@ -10,7 +10,7 @@ block nav
           br
           li: a.scroll.section(href='#' + href)= (page.menu || page.title)
         - else
-          li: a.scroll(href='#' + href)= (page.menu || page.title)
+          li: a.scroll(href='#' + href)= (page.title)
 
   - if (files.page)
     ul.pages
@@ -36,5 +36,5 @@ block content
         - if (section.section)
           h1.section(id=href + '-section'): a(name=href)= section.title
         else
-          h1(id=href + '-section'): a(name=href)= section.title
+          h1(id=href + '-section'): a(name=href)= section.subtitle || section.title
         section!= section.prepared

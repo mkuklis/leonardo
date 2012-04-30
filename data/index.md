@@ -12,10 +12,10 @@ The default build includes the following modules:
 Core, Element, Animation, Event, Transformation
 
 <br />
-<a class="download" href='leonardo.js'>Development v1.0.1</a>
+<a class="download" href='leonardo.js'>Development v0.1.0</a>
 40kb, Full source, lots of comments
 
-<a class="download" href='leonardo.js'>Production v1.0.1</a>
+<a class="download" href='leonardo.min.js'>Production v0.1.0</a>
 18kb, Packed and gzipped
 
 # Target Platforms

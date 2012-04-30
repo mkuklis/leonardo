@@ -404,6 +404,37 @@ a.download {
   cursor: pointer;
   font-weight: bold;
 }
+canvas {
+  background-color: #fff;
+  border: 1px solid #e6e6e6;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+table {
+  border-spacing: 10px;
+}
+table td {
+  padding: 3px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+table td.string {
+  text-align: center;
+  background-color: #94d971;
+}
+table td.number {
+  background-color: #c4daf5;
+}
+table td.object {
+  text-align: center;
+  background-color: #face76;
+}
 pre {
   padding: 15px;
   margin: 15px;
