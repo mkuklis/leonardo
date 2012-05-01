@@ -44,10 +44,10 @@ All calls to drawing methods depend on Leonardo object so intialization has to h
 **Usage**
 
     // creates new leonardo object with 200px x 300px canvas at 50, 100
-    var paper = leonardo(50, 100, 200, 300);
+    var leo = leonardo(50, 100, 200, 300);
 
     // creates new leonardo object with a reference to canvas with id = #paper
-    var paper = leonardo("#paper");
+    var leo = leonardo("#paper");
 
-    // or if you are fun of new
-    var paper = new Leonardo("#paper");
+    // or if you are a fun of new
+    var leo = new Leonardo("#paper");

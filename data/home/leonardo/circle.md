@@ -1,6 +1,6 @@
 ---
   title: circle
-  subtitle: leonardo.paper(x, y, r, [attrs])
+  subtitle: leonardo.circle(x, y, r, [attrs])
   weight: 102
   render-file: false
 ---
@@ -36,7 +36,7 @@ Draws a circle.
 **Usage**
 
     // creates and draws circle with radius 25 filled with color
-    var circle = paper.circle(30, 30, 25, {fill: '#FF7400'});
+    var circle = leo.circle(30, 30, 25, {fill: '#FF7400'});
 
 **Example**
 
