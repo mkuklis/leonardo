@@ -2,22 +2,34 @@
   <head></head>
   <body>
     <script src="../../src/leonardo.js"></script>
+    <script src="../../src/matrix.js"></script>
     <script src="../../src/color.js"></script>
     <script src="../../src/element.js"></script>
-    <script src="../../src/matrix.js"></script>
+    <script src="../../src/emitter.js"></script>
+    <script src="../../src/event.js"></script>
+    <script src="../../src/polyfill.js"></script>
+    <script src="../../src/easings.js"></script>
+    <script src="../../src/animation.js"></script>
+    <script src="../../src/transformation.js"></script>
+
     <script>
-      Leonardo.debug = true;
+      Leonardo.debug = false;
+      var paper = leonardo(0, 0, 500, 500);
 
-      var paper = Leonardo(0, 0, 500, 500);
-
+      /*
       paper.path([
         {M: [50, 50]},
-        {L: [100, 100, 120, 200]}]);
+        {L: [100, 100, 120, 200]}]).draw();
 
+      */
+
+      var rect = paper.rect(10, 10, 100, 100, 10, {fill: "#fefe00"});
+      rect.drag();
+      rect.draw();
       //var rect1 = paper.rect(50, 50, 50, 50).attr({fill: '#ff0000'}).drag().rotate(45).scale(1.75, 1.75);
       //var rect2 = paper.circle(150, 150, 100).drag();
      // var img = paper.image('img/mkuklis.png', 100, 100, 100, 100).drag();
-
+/*
      var circle = paper.circle(100, 100, 100);
       //paper.rect(100, 100, 100, 100).drag();
 
@@ -41,7 +53,7 @@
       //rect.rotate(angle++);
       //rect.drag();
       //}, 10);
-
+*/
       /*
       var circle1 = paper.circle(100, 100, 12, {
         fill: "r:0-#A7D30C:0.9-#019F62:1-rgba(1,159,98,0)",

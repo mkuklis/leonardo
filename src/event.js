@@ -22,6 +22,7 @@
       // handle drag
       if (this.flags.dragging) {
         this.attr({x: pt.x - this.attrs.dx, y: pt.y - this.attrs.dy});
+        this.redraw();
       }
 
       // handle mouseover

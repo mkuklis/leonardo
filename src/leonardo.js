@@ -145,7 +145,7 @@
      * @api public
      */
 
-    path: function (command) {
+    path: function (command, options) {
       var path;
 
       if (L.is('Array', command)) {

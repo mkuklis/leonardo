@@ -48,7 +48,12 @@
           this.updateBbox({x: a.tx - a.r, y: a.ty - a.r, w: 2 * a.r, h: 2 * a.r});
         }
       , rect: function (a) {
-          this.ctx.rect(a.tx, a.ty, a.w, a.h);
+          if (a.r && a.r > 0) {
+            this.roundRect();
+          }
+          else {
+            this.ctx.rect(a.tx, a.ty, a.w, a.h);
+          }
           this.updateBbox({x: a.tx, y: a.ty, w: a.w, h: a.h});
         }
       , path: function () {
@@ -213,7 +218,7 @@
       }
 
       a.stroke = a.stroke || '#000000';
-      this.ctx.strokeStyle = L.C.toColor(a.stroke, a.stroke-opacity);
+      this.ctx.strokeStyle = L.C.toColor(a.stroke, a['stroke-opacity']);
       this.ctx.lineWidth = a['stroke-width'] || 1.0;
 
       if (this.trans) {
@@ -395,6 +400,28 @@
       }
 
       return gr;
+    },
+
+    /**
+     * Draws rect with rounded corners.
+     *
+     * @api private
+     */
+
+    roundRect: function() {
+      var a = this.attrs;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(a.x + a.r, a.y);
+      this.ctx.lineTo(a.x + a.w - a.r, a.y);
+      this.ctx.quadraticCurveTo(a.x + a.w, a.y, a.x + a.w, a.y + a.r);
+      this.ctx.lineTo(a.x + a.w, a.y + a.h - a.r);
+      this.ctx.quadraticCurveTo(a.x + a.w, a.y + a.h, a.x + a.w - a.r, a.y + a.h);
+      this.ctx.lineTo(a.x + a.r, a.y + a.h);
+      this.ctx.quadraticCurveTo(a.x, a.y + a.h, a.x, a.y + a.h - a.r);
+      this.ctx.lineTo(a.x, a.y + a.r);
+      this.ctx.quadraticCurveTo(a.x, a.y, a.x + a.r, a.y);
+      this.ctx.closePath();
     },
 
     /**
