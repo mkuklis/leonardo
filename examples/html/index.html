@@ -23,9 +23,12 @@
 
       */
 
-      var rect = paper.rect(10, 10, 100, 100, 10, {fill: "#fefe00"});
-      rect.drag();
-      rect.draw();
+      var rect1 = paper.rect(10, 10, 100, 100, 10, {fill: "#fefe00"});
+      rect1.drag();
+
+      var rect2 = paper.rect(200, 200, 100, 100, {fill: "#fefe00"});
+      rect2.drag();
+
       //var rect1 = paper.rect(50, 50, 50, 50).attr({fill: '#ff0000'}).drag().rotate(45).scale(1.75, 1.75);
       //var rect2 = paper.circle(150, 150, 100).drag();
      // var img = paper.image('img/mkuklis.png', 100, 100, 100, 100).drag();
