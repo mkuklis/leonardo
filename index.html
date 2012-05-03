@@ -279,9 +279,99 @@ All calls to drawing methods depend on Leonardo object so intialization has to h
 <canvas id="rect" width="100" height="100"></canvas>
 
         </section>
-        <h1 id="path-section"><a name="path">path</a>
+        <h1 id="path-section"><a name="path">leonardo.path(command, [options])</a>
         </h1>
-        <section>
+        <section><p>Creates and draws path element based on given command(s).
+
+</p>
+<p><strong>Parameters</strong>
+
+</p>
+<table>
+  <tr>
+    <td>command</td>
+    <td class="type object">Object</td>
+    <td>single path command</td>
+  </tr>
+  <tr>
+    <td>options</td>
+    <td class="type object">Object</td>
+    <td>options</td>
+  </tr>
+  <tr>
+    <td colspan="3">OR</td>
+  </tr>
+  <tr>
+    <td>commands</td>
+    <td class="type array">Array</td>
+    <td>array of multiple path commands</td>
+  </tr>
+  <tr>
+    <td>options</td>
+    <td class="type object">Object</td>
+    <td>options</td>
+  </tr>
+</table>
+
+<p>Single path command is a JSON object where the key represents the type of the command 
+and the value represents command&apos;s argument(s).
+
+</p>
+<p><strong>Available Commands</strong>
+
+</p>
+<table>
+  <tr>
+    <td>M</td>
+    <td>{M: [x, y, ...]}</td>
+    <td>move to point with x, y coordinates</td>
+  </tr>
+  <tr>
+    <td>L</td>
+    <td>{L: [x, y, ...]}</td>
+    <td>draw line to x, y</td>
+  </tr>
+  <tr>
+    <td>V</td>
+    <td>{V: x}</td>
+    <td>draw vertical line to x</td>
+  </tr>
+  <tr>
+    <td>H</td>
+    <td>{H: y}</td>
+    <td>draw horizontal line to y</td>
+  </tr>
+  <tr>
+    <td>Q</td>
+    <td>{Q: [cp1x, cp1y, x1, y1, cp2x, cp2y, x2, y2, ...]}</td>
+    <td>draw quadratric curve</td>
+  </tr>
+  <tr>
+    <td>B</td>
+    <td>{B: [cp1x, cp1y, x1, y1, cp2x, cp2y, x2, y2, ...]}</td>
+    <td>draw bezier curve</td>
+  </tr>
+</table>
+
+<p><strong>Usage</strong>
+
+</p>
+<pre><code><span class="comment">// draw quadratic curve</span>
+leo.path([
+  {M: [<span class="number">200</span>, <span class="number">30</span>]},
+  {Q: [<span class="number">300</span>, <span class="number">0</span>, <span class="number">288</span>, <span class="number">120</span>]}]);
+
+<span class="comment">// draw heart</span>
+leo.path([
+  {M:[<span class="number">75</span>, <span class="number">40</span>]},
+  {B:[<span class="number">75</span>,<span class="number">37</span>,<span class="number">70</span>,<span class="number">25</span>,<span class="number">50</span>,<span class="number">25</span>, <span class="number">20</span>,<span class="number">25</span>,<span class="number">20</span>,<span class="number">62.5</span>,<span class="number">20</span>,<span class="number">62.5</span>,
+      <span class="number">20</span>,<span class="number">80</span>,<span class="number">40</span>,<span class="number">102</span>,<span class="number">75</span>,<span class="number">120</span>, <span class="number">110</span>,<span class="number">102</span>,<span class="number">130</span>,<span class="number">80</span>,<span class="number">130</span>,<span class="number">62.5</span>,
+      <span class="number">130</span>,<span class="number">62.5</span>,<span class="number">130</span>,<span class="number">25</span>,<span class="number">100</span>,<span class="number">25</span>, <span class="number">85</span>,<span class="number">25</span>,<span class="number">75</span>,<span class="number">37</span>,<span class="number">75</span>,<span class="number">40</span>]}]);</code></pre>
+<p><strong>Example</strong>
+
+</p>
+<canvas id="path" width="300" height="130"></canvas>
+
         </section>
         <h1 id="image-section"><a name="image">image</a>
         </h1>
