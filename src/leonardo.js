@@ -156,14 +156,14 @@
      * @api public
      */
 
-    path: function (command, options) {
+    path: function (command, attrs, options) {
       var path;
 
       if (L.is('Array', command)) {
         command = {path: command};
       }
 
-      path = L.E('path', command, this, options);
+      path = L.E('path', L.extend(command, attrs), this, options);
 
       path.draw();
 

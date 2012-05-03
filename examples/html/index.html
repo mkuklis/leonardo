@@ -13,140 +13,27 @@
     <script src="../../src/transformation.js"></script>
 
     <script>
-      var paper = leonardo(0, 0, 500, 500);
 
+      var paper = leonardo(0, 0, 500, 500);
+      /*
       paper.circle(250, 250, 222);
       paper.rect(68, 105, 366, 366);
-
       paper.rect(224, 288, 20, 183);
-
       paper.rect(254, 288, 20, 183);
-
       paper.rect(224, 165, 50, 123);
-
       paper.circle(249, 135, 30);
-
       paper.rect(190, 278, 20, 183).rotate(30).redraw();
       paper.rect(290, 278, 20, 183).rotate(-30).redraw();
-
       paper.rect(68, 178, 154, 17);
       paper.rect(274, 178, 154, 17);
-
       paper.rect(270, 138, 154, 17).rotate(155).redraw();
       paper.rect(73, 138, 154, 17).rotate(-155).redraw();
-
-      /*
-      paper.path([
-        {M: [50, 50]},
-        {L: [100, 100, 120, 200]}]).draw();
-
       */
-
-      //var rect1 = paper.rect(10, 10, 100, 100, 10, {fill: "#fefe00"});
-      //rect1.drag();
-
-      //var rect2 = paper.rect(200, 200, 100, 100, {fill: "#fefe00"});
-      //rect2.drag();
-
-      //var rect3 = paper.rect(50, 50, 50, 50).attr({fill: '#ff0000'}).drag().rotate(45).scale(1.75, 1.75);
-      //var rect4 = paper.circle(150, 150, 100).drag();
-      //var img = paper.image('img/mkuklis.png', 100, 100, 100, 100).drag();
-/*
-     var circle = paper.circle(100, 100, 100);
-      //paper.rect(100, 100, 100, 100).drag();
-
-
-      paper.path([
-        {M:[75, 25]},
-        {Q:[25,25,25,62.5, 25,100,50,100, 50,120,30,125, 60,120,65,100, 125,100,125,62.5, 125,25,75,25]}]);
-
-      paper.path([
+      var path = paper.path([
         {M:[75, 40]},
         {B:[75,37,70,25,50,25, 20,25,20,62.5,20,62.5,
             20,80,40,102,75,120, 110,102,130,80,130,62.5,
-            130,62.5,130,25,100,25, 85,25,75,37,75,40]}]);
-
-      //rect.drag();
-  //    var angle = 45;
-      // var circle = paper.circle(100, 100, 50).drag();
-      // paper.circle(25, 25, 25).drag();
-      // rect.drag();
-      //setInterval(function () {
-      //rect.rotate(angle++);
-      //rect.drag();
-      //}, 10);
-*/
-      /*
-      var circle1 = paper.circle(100, 100, 12, {
-        fill: "r:0-#A7D30C:0.9-#019F62:1-rgba(1,159,98,0)",
-        "stroke-opacity": 0.0,
-        text: "1",
-        font: 'bold 15px Arial',
-        'font-color': 'red'}, {redraw: false});
-      //.drag();
-
-      var circle2 = paper.circle(10, 10, 12,{
-        fill: "r:0-#A7D30C:0.9-#019F62:1-rgba(1,159,98,0)",
-        "stroke-opacity": 0.0,
-        text: "2",
-        font: 'bold 15px Arial',
-        'font-color': 'red'})
-      .touch(function () {
-
-        var s = circle1.attr(['x','y']);
-        var e = this.attr(['x','y']);
-
-        var vx = e[0] - s[0];
-        var vy = e[1] - s[1];
-
-        var mag = Math.sqrt(vx * vx + vy * vy);
-        var distance = this.attr('r');
-
-        vx = (vx / mag) * (distance -1);
-        vy = (vy / mag) * (distance - 1);
-
-        var x1 = s[0] + vx;
-        var y1 = s[1] + vy;
-        var x2 = e[0] - vx;
-        var y2 = e[1] - vy;
-
-        paper.path([{M:[x1, y1]},{L: [x2, y2]}]);
-      });
-*/
-/*
-      var circle2 = paper.circle(150, 100,  50);
-      circle2.attr({fill: "#00ff00", stroke: "#00ff00", opacity: 0.3});
-      var circle3 = paper.circle(125, 150,  50);
-      circle3.attr({fill: "#0000ff", stroke: "#0000ff", opacity: 0.3});
-
-      circle1
-        .mouseover(function () {
-          //this.attr({opacity: 0.8});
-        })
-        .mouseout(function () {
-          //this.attr({opacity: 0.3});
-        })
-        .drag();
-
-      circle2
-        .mouseover(function () {
-          this.attr({opacity: 0.8});
-        })
-        .mouseout(function () {
-          this.attr({opacity: 0.5});
-        })
-        .drag();
-
-
-      circle3
-        .mouseover(function () {
-          this.attr({fill: "#0000ff", opacity: 0.8});
-        })
-        .mouseout(function () {
-          this.attr({opacity: 0.5});
-        })
-        .drag();
-*/
+            130,62.5,130,25,100,25, 85,25,75,37,75,40]}], {fill: "#ff0000"});
 
     </script>
   </body>
