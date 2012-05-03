@@ -99,6 +99,8 @@
       var pos = { x: x || 0, y: y || 0, r: r || 0 }
         , circle = L.E('circle', L.extend(pos, attrs), this);
 
+      circle.draw();
+
       return circle;
     },
 
@@ -109,16 +111,25 @@
      * @param {Number} y - y coordinate of the top left corner
      * @param {Number} w - width
      * @param {Number} h - height
-     * @param {Number} r - radius for rounded corners, default is 0
+     * @param {Number} r - radius for rounded corners, optional default is 0
+     * @param {Object} attrs - optional attributes described
+     *  by `Element.attr`
      *
-     * @param {Object} attrs - additional attributes
-     * described by `Element.attr`
      * @api public
      */
 
     rect: function (x, y, w, h, r, attrs) {
-      var pos = { x: x || 0, y: y || 0, w: w || 0, h: h || 0, r: r || 0 }
-        , rect = L.E('rect', L.extend(pos, attrs), this);
+      var args = arguments, pos, rect;
+
+      if (args.length == 5 && L.is("Object", args[4])) {
+        attrs = args[4];
+      }
+
+      pos = { x: x || 0, y: y || 0, w: w || 0, h: h || 0, r: r || 0 };
+      rect = L.E('rect', L.extend(pos, attrs), this);
+
+      rect.draw();
+
       return rect;
     },
 
@@ -145,7 +156,7 @@
      * @api public
      */
 
-    path: function (command) {
+    path: function (command, options) {
       var path;
 
       if (L.is('Array', command)) {
@@ -153,6 +164,9 @@
       }
 
       path = L.E('path', command, this, options);
+
+      path.draw();
+
       return path;
     },
 
@@ -172,6 +186,8 @@
     image: function (src, x, y, w, h, attrs) {
       var pos = {src: src, x: x || 0, y: y || 0, w: w || 0, h: h || 0}
         , image = L.E('image', L.extend(pos, attrs), this);
+
+      image.draw();
 
       return image;
     },
@@ -608,7 +624,12 @@
           this.updateBbox({x: a.tx - a.r, y: a.ty - a.r, w: 2 * a.r, h: 2 * a.r});
         }
       , rect: function (a) {
-          this.ctx.rect(a.tx, a.ty, a.w, a.h);
+          if (a.r && a.r > 0) {
+            this.roundRect();
+          }
+          else {
+            this.ctx.rect(a.tx, a.ty, a.w, a.h);
+          }
           this.updateBbox({x: a.tx, y: a.ty, w: a.w, h: a.h});
         }
       , path: function () {
@@ -773,7 +794,7 @@
       }
 
       a.stroke = a.stroke || '#000000';
-      this.ctx.strokeStyle = L.C.toColor(a.stroke, a.stroke-opacity);
+      this.ctx.strokeStyle = L.C.toColor(a.stroke, a['stroke-opacity']);
       this.ctx.lineWidth = a['stroke-width'] || 1.0;
 
       if (this.trans) {
@@ -958,6 +979,28 @@
     },
 
     /**
+     * Draws rect with rounded corners.
+     *
+     * @api private
+     */
+
+    roundRect: function() {
+      var a = this.attrs;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(a.x + a.r, a.y);
+      this.ctx.lineTo(a.x + a.w - a.r, a.y);
+      this.ctx.quadraticCurveTo(a.x + a.w, a.y, a.x + a.w, a.y + a.r);
+      this.ctx.lineTo(a.x + a.w, a.y + a.h - a.r);
+      this.ctx.quadraticCurveTo(a.x + a.w, a.y + a.h, a.x + a.w - a.r, a.y + a.h);
+      this.ctx.lineTo(a.x + a.r, a.y + a.h);
+      this.ctx.quadraticCurveTo(a.x, a.y + a.h, a.x, a.y + a.h - a.r);
+      this.ctx.lineTo(a.x, a.y + a.r);
+      this.ctx.quadraticCurveTo(a.x, a.y, a.x + a.r, a.y);
+      this.ctx.closePath();
+    },
+
+    /**
      * Updates bbox state.
      *
      * @param {Object} a
@@ -1081,6 +1124,7 @@
       // handle drag
       if (this.flags.dragging) {
         this.attr({x: pt.x - this.attrs.dx, y: pt.y - this.attrs.dy});
+        this.redraw();
       }
 
       // handle mouseover
