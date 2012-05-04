@@ -18,4 +18,7 @@ $(function () {
     {M: [200, 30]},
     {Q: [300, 0, 288, 120]}]);
 
+  var leo = leonardo('image');
+  var image = leo.image("public/img/image.jpg", 10, 10, 90, 90);
+
 });

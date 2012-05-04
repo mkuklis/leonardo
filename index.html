@@ -373,9 +373,58 @@ leo.path([
 <canvas id="path" width="300" height="130"></canvas>
 
         </section>
-        <h1 id="image-section"><a name="image">image</a>
+        <h1 id="image-section"><a name="image">leonardo.image(src, x, y, w, h, [attrs])</a>
         </h1>
-        <section><p>Renders image.
+        <section><p>Imports image into canvas.
+
+</p>
+<p><strong>Parameters</strong>
+
+
+</p>
+<table>
+  <tr>
+    <td>src</td>
+    <td class="type string">String</td>
+    <td>image source (URI)</td>
+  </tr>
+  <tr>
+    <td>x</td>
+    <td class="type number">Number</td>
+    <td>x coordinate</td>
+  </tr>
+  <tr>
+    <td>y</td>
+    <td class="type number">Number</td>
+    <td>y coordinate</td>
+  </tr>
+  <tr>
+    <td>w</td>
+    <td class="type number">Number</td>
+    <td>width</td>
+  </tr>
+  <tr>
+    <td>h</td>
+    <td class="type number">Number</td>
+    <td>height</td>
+  </tr>
+  <tr>
+    <td>attrs</td>
+    <td class="type object">Object</td>
+    <td>attributes</td>
+  </tr>
+</table>
+
+
+<p><strong>Usage</strong>
+
+</p>
+<pre><code><span class="comment">// load image into canvas</span>
+<span class="keyword">var</span> image = leo.image(<span class="string">"image.png"</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="number">90</span>, <span class="number">90</span>);</code></pre>
+<p><strong>Example</strong>
+
+</p>
+<p><canvas id="image" width="110" height="110">&lt;/canvas
 </p>
 
         </section>
