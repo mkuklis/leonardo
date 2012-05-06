@@ -156,14 +156,14 @@
      * @api public
      */
 
-    path: function (command, options) {
+    path: function (command, attrs, options) {
       var path;
 
       if (L.is('Array', command)) {
         command = {path: command};
       }
 
-      path = L.E('path', command, this, options);
+      path = L.E('path', L.extend(command, attrs), this, options);
 
       path.draw();
 
@@ -1259,13 +1259,16 @@
     return this;
   }
 
-  E.fn.on = function (event, fn) {
-    this.callbacks[event] = this.callbacks[event] || [];
-    this.em.on(emap[event] || event, handlers[emap[event]], this);
+  E.fn.on = function (e, fn) {
+    var event = emap[e] || e;
+
+    this.callbacks[e] = this.callbacks[e] || [];
+    this.em.on(event, handlers[event], this);
 
     if (fn) {
-      this.callbacks[event].push(fn);
+      this.callbacks[e].push(fn);
     }
+
     return this;
   }
 

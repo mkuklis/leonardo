@@ -157,13 +157,16 @@
     return this;
   }
 
-  E.fn.on = function (event, fn) {
-    this.callbacks[event] = this.callbacks[event] || [];
-    this.em.on(emap[event] || event, handlers[emap[event]], this);
+  E.fn.on = function (e, fn) {
+    var event = emap[e] || e;
+
+    this.callbacks[e] = this.callbacks[e] || [];
+    this.em.on(event, handlers[event], this);
 
     if (fn) {
-      this.callbacks[event].push(fn);
+      this.callbacks[e].push(fn);
     }
+
     return this;
   }
 
