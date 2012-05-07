@@ -10,11 +10,13 @@
       , "dragend": "mouseup"
     };
 
+  var slice = Array.prototype.slice;
+
   // canvas event handlers
   var handlers = {
-    click: function (pos) {
-      if (isPointInRange(this, pos)) {
-        this.execCallbacks('click');
+    click: function (pt) {
+      if (isPointInRange(this, pt)) {
+        this.execCallbacks('click', pt);
       }
     },
 
@@ -31,11 +33,11 @@
         if (!prevIndex || curIndex > prevIndex || this.l.flags.dragging) {
           if (curIndex > prevIndex) {
             var el = this.l.elements[prevIndex];
-            el.execCallbacks('mouseout');
+            el.execCallbacks('mouseout', pt);
             el.flags.over = false;
           }
 
-          this.execCallbacks('mouseover');
+          this.execCallbacks('mouseover', pt);
           this.l.flags.mouseover = curIndex;
           this.flags.over = true;
           return true;
@@ -45,7 +47,7 @@
       // handle mouseout
       else if (this.flags.over && !isPointInRange(this, pt)) {
         this.flags.over = false;
-        this.execCallbacks('mouseout');
+        this.execCallbacks('mouseout', pt);
         delete this.l.flags.mouseover;
       }
     },
@@ -57,10 +59,10 @@
           this.l.flags.dragging = true;
           this.toFront();
           this.attr({dx: pt.x - this.attrs.x, dy: pt.y - this.attrs.y}, {silent: true});
-          this.execCallbacks('dragstart');
+          this.execCallbacks('dragstart', pt);
         }
         else {
-          this.execCallbacks('mousedown');
+          this.execCallbacks('mousedown', pt);
         }
 
         return true;
@@ -71,11 +73,11 @@
       if (this.callbacks.dragend && this.flags.dragging) {
         this.flags.dragging = false;
         this.l.flags.dragging = false;
-        this.execCallbacks('dragend');
+        this.execCallbacks('dragend', pt);
         this.em.trigger('dragend', this);
       }
       else {
-        this.execCallbacks('mouseup');
+        this.execCallbacks('mouseup', pt);
       }
     }
   };
@@ -204,8 +206,9 @@
   E.fn.execCallbacks = function (event) {
     var callbacks = this.callbacks[event];
     if (callbacks) {
+      var args = slice.call(arguments, 1);
       for (var i = 0, l = callbacks.length; i < l; i++) {
-        L.is("Function", callbacks[i]) && callbacks[i].call(this);
+        L.is("Function", callbacks[i]) && callbacks[i].apply(this, args);
       }
     }
   }

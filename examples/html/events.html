@@ -15,8 +15,8 @@
     <script>
       var leo = leonardo(0, 0, 500, 500);
       var circle = leo.circle(250, 250, 222);
-      circle.click(function () {
-        console.log('test');
+      circle.drag(function () {
+        console.log(arguments);
       });
 
     </script>
