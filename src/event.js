@@ -72,6 +72,7 @@
         this.flags.dragging = false;
         this.l.flags.dragging = false;
         this.execCallbacks('dragend');
+        this.em.trigger('dragend', this);
       }
       else {
         this.execCallbacks('mouseup');
@@ -143,10 +144,24 @@
     this.callbacks = {};
   });
 
-  E.fn.drag = function (start, move, end) {
-    this.on("dragstart", start);
-    this.on("dragmove", move);
-    this.on("dragend", end);
+  E.fn.drag = function (dragstart, dragmove, dragend) {
+    var args = arguments;
+
+    if (L.is('Object', args[0])) {
+      var handlers = { dragstart: true, dragmove: true, dragend: true };
+      handlers = L.extend(handlers, args[0]);
+
+      for (var key in handlers) {
+        this.on(key, handlers[key]);
+      }
+
+      return this;
+    }
+
+    this.on("dragstart", dragstart);
+    this.on("dragmove", dragmove);
+    this.on("dragend", dragend);
+
     return this;
   }
 

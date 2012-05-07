@@ -170,6 +170,8 @@
 
     attr: function (args, options) {
 
+      options = options || {};
+
       if (L.is('String', args)) {
         return this.attrs[args];
       }
@@ -186,7 +188,9 @@
         this.attrs[key] = args[key];
       }
 
-      this.em.trigger('change:attrs', this);
+      if (!options.silent) {
+        this.em.trigger('change:attrs', this);
+      }
 
       return this;
     },
