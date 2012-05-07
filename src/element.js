@@ -186,6 +186,8 @@
         this.attrs[key] = args[key];
       }
 
+      this.em.trigger('change:attrs', this);
+
       return this;
     },
 
