@@ -6,19 +6,59 @@
     <script src="../../src/color.js"></script>
     <script src="../../src/element.js"></script>
     <script src="../../src/emitter.js"></script>
+    <script src="../../src/transformation.js"></script>
+
     <script src="../../src/event.js"></script>
     <script src="../../src/polyfill.js"></script>
     <script src="../../src/easings.js"></script>
     <script src="../../src/animation.js"></script>
     <script src="../../src/transformation.js"></script>
 
+    <!--
+    <canvas id="canvas" width="500px" height="500px"></canvas>
+    -->
     <script>
-      var leo = leonardo(0, 0, 500, 500);
-      var circle = leo.circle(250, 250, 222);
-      circle.drag(function () {
-        console.log(arguments);
-      });
 
+      var leo = leonardo(0, 0, 500, 500);
+      var rect = leo.rect(100, 100, 100, 100, {fill: '#ff0000'});
+
+      rect.rotate(45).redraw();
+      rect.redraw();
+      rect.drag();
+
+      /*
+      var triangle = leo.path([
+        {M: [100, 100]},
+        {L: [200, 100, 50, 50, 100, 100]}],
+        {fill: "#ff0000"});
+
+      triangle.click(function () {
+        console.log('clicked..');
+      });
+      */
+
+      /*
+      var canvas = document.getElementById('canvas');
+      var ctx = canvas.getContext("2d");
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.fillStyle = "rgb(" + 0 + "," + 0 + "," + 0 + ")";
+      ctx.stroke();
+
+      //ctx.rotate(45 * Math.PI / 180);
+
+      ctx.moveTo(100, 100);
+      ctx.lineTo(200, 100);
+      ctx.lineTo(50, 50);
+      ctx.lineTo(100, 100);
+
+      //ctx.translate(50, 50);
+      //ctx.rotate(45 * Math.PI / 180);
+      ctx.fill();
+      ctx.closePath();
+      ctx.restore();
+      */
     </script>
   </body>
 </html>

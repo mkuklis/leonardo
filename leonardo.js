@@ -746,6 +746,8 @@
 
     attr: function (args, options) {
 
+      options = options || {};
+
       if (L.is('String', args)) {
         return this.attrs[args];
       }
@@ -762,7 +764,9 @@
         this.attrs[key] = args[key];
       }
 
-      this.em.trigger('change:attrs', this);
+      if (!options.silent) {
+        this.em.trigger('change:attrs', this);
+      }
 
       return this;
     },
@@ -1114,11 +1118,13 @@
       , "dragend": "mouseup"
     };
 
+  var slice = Array.prototype.slice;
+
   // canvas event handlers
   var handlers = {
-    click: function (pos) {
-      if (isPointInRange(this, pos)) {
-        this.execCallbacks('click');
+    click: function (pt) {
+      if (isPointInRange(this, pt)) {
+        this.execCallbacks('click', pt);
       }
     },
 
@@ -1135,11 +1141,11 @@
         if (!prevIndex || curIndex > prevIndex || this.l.flags.dragging) {
           if (curIndex > prevIndex) {
             var el = this.l.elements[prevIndex];
-            el.execCallbacks('mouseout');
+            el.execCallbacks('mouseout', pt);
             el.flags.over = false;
           }
 
-          this.execCallbacks('mouseover');
+          this.execCallbacks('mouseover', pt);
           this.l.flags.mouseover = curIndex;
           this.flags.over = true;
           return true;
@@ -1149,7 +1155,7 @@
       // handle mouseout
       else if (this.flags.over && !isPointInRange(this, pt)) {
         this.flags.over = false;
-        this.execCallbacks('mouseout');
+        this.execCallbacks('mouseout', pt);
         delete this.l.flags.mouseover;
       }
     },
@@ -1161,10 +1167,10 @@
           this.l.flags.dragging = true;
           this.toFront();
           this.attr({dx: pt.x - this.attrs.x, dy: pt.y - this.attrs.y}, {silent: true});
-          this.execCallbacks('dragstart');
+          this.execCallbacks('dragstart', pt);
         }
         else {
-          this.execCallbacks('mousedown');
+          this.execCallbacks('mousedown', pt);
         }
 
         return true;
@@ -1175,10 +1181,11 @@
       if (this.callbacks.dragend && this.flags.dragging) {
         this.flags.dragging = false;
         this.l.flags.dragging = false;
-        this.execCallbacks('dragend');
+        this.execCallbacks('dragend', pt);
+        this.em.trigger('dragend', this);
       }
       else {
-        this.execCallbacks('mouseup');
+        this.execCallbacks('mouseup', pt);
       }
     }
   };
@@ -1247,10 +1254,24 @@
     this.callbacks = {};
   });
 
-  E.fn.drag = function (start, move, end) {
-    this.on("dragstart", start);
-    this.on("dragmove", move);
-    this.on("dragend", end);
+  E.fn.drag = function (dragstart, dragmove, dragend) {
+    var args = arguments;
+
+    if (L.is('Object', args[0])) {
+      var handlers = { dragstart: true, dragmove: true, dragend: true };
+      handlers = L.extend(handlers, args[0]);
+
+      for (var key in handlers) {
+        this.on(key, handlers[key]);
+      }
+
+      return this;
+    }
+
+    this.on("dragstart", dragstart);
+    this.on("dragmove", dragmove);
+    this.on("dragend", dragend);
+
     return this;
   }
 
@@ -1293,8 +1314,9 @@
   E.fn.execCallbacks = function (event) {
     var callbacks = this.callbacks[event];
     if (callbacks) {
+      var args = slice.call(arguments, 1);
       for (var i = 0, l = callbacks.length; i < l; i++) {
-        L.is("Function", callbacks[i]) && callbacks[i].call(this);
+        L.is("Function", callbacks[i]) && callbacks[i].apply(this, args);
       }
     }
   }
@@ -1808,56 +1830,47 @@
   // Element
   var E = L.E;
 
-  function center(attrs, cx, cy) {
-    var a = attrs;
-
-    if (typeof cx == "undefined") {
-      cx = a.w/2;
-      cy = a.h/2;
-    }
-
-    a.cx = cx;
-    a.cy = cy;
-    a.tx = -cx;
-    a.ty = -cy;
+  // TODO find centroid
+  function findCenter(el) {
+    var a = el.attrs;
+    return  [a.w / 2, a.h / 2];
   }
 
   // transformation commands
-  var transCommands = {
-    r: function (angle, cx, cy) {
-      var a = this.attrs;
-      this.trans = this.trans || {};
-      center(a, cx, cy);
-      this.trans.r = { angle: angle, cx: a.cx, cy: a.cy };
-    },
-    s: function (sx, sy, cx, cy) {
-      var a = this.attrs;
-      this.trans = this.trans || {};
-      center(a, cx, cy);
-      this.trans.s = { sx: sx, sy: sy, cx: a.cx, cy: a.cy };
-    }
-  }
-
-  // draw transformation commands
   var ctxCommands = {
-    r: function (t) {
-      this.m.rotate(t.angle);
-      this.ctx.rotate(t.angle * Math.PI / 180);
+    // rotate
+    r: function (angle, cx, cy) {
+      this.m.rotate(angle);
+      this.ctx.rotate(angle * Math.PI / 180);
     },
-    s: function (t) {
-      this.m.scale(t.sx, t.sy);
-      this.ctx.scale(t.sx, t.sy);
+    // scale
+    s: function (sx, sy, cx, cy) {
+      this.m.scale(sx, sy);
+      this.ctx.scale(sx, sy);
+    },
+    // translate
+    t: function (x, y) {
+      var a = this.attrs;
+      this.m.translate(a.x + x, a.y + y);
+      this.ctx.translate(a.x + x, a.y + y);
+      a.tx = -x;
+      a.ty = -y;
     }
   };
 
-  // Element transformation API
   E.fn.rotate = function (angle, cx, cy) {
-    this.transform({r: [angle, cx, cy]});
+    var args = [angle];
+    if (cx && cy) { args.push(cx, cy); }
+    this.transform({r: args});
+
     return this;
   }
 
   E.fn.scale = function (sx, sy, cx, cy) {
-    this.transform({s: [sx, sy, cx, cy]});
+    var args = [sx, sy];
+    if (cx && cy) { args.push(cx, cy); }
+    this.transform({s: args});
+
     return this;
   }
 
@@ -1867,12 +1880,18 @@
    *
    * format:
    *
-   * {r:[90,0,0],s:[10,10,0,0],R:[90, 0,0]}
+   * {r:[90,0,0], s:[10,10,0,0], R:[90, 0,0]}
    */
   E.fn.transform = function (attrs) {
+    this.trans = this.trans || {};
+
     for (var key in attrs) {
       if (attrs.hasOwnProperty(key)) {
-        transCommands[key].apply(this, attrs[key]);
+        // find center
+        if (attrs[key].length < 3) {
+          attrs[key] = attrs[key].concat(findCenter(this));
+        }
+        this.trans[key] = attrs[key];
       }
     }
 
@@ -1882,12 +1901,12 @@
   E.fn.processTransform = function () {
     var a = this.attrs;
     this.m.reset();
-    this.m.translate(a.x + a.cx, a.y + a.cy);
-    this.ctx.translate(a.x + a.cx, a.y + a.cy);
 
     for (var key in this.trans) {
       if (this.trans.hasOwnProperty(key)) {
-        ctxCommands[key].call(this, this.trans[key]);
+        var t = this.trans[key];
+        ctxCommands.t.apply(this, t.slice(-2));
+        ctxCommands[key].apply(this, t);
       }
     }
   }
